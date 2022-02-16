@@ -1,0 +1,12 @@
+﻿{
+  "culture": "en",
+  "texts": {
+
+    "Permission:OrganizationUnits": "Orgnization Management",
+    "Permission:OrganizationUnits_Default": "View/Check Orgnizations",
+    "Permission:OrganizationUnits_ManageOrganizationTree": "Manage orgnization structure",
+    "Permission:OrganizationUnits_ManageMembers": "Manage Members",
+    "Permission:OrganizationUnits_ManageRoles": "Manage Roles",
+    "Permission:OrganizationUnits_ManagePermissions": "Manage Permissions"
+  }
+}

@@ -1,0 +1,8 @@
+﻿{
+  "culture": "en",
+  "texts": {
+    "Permission:TenantDashboard": "Tenant Dashboard",
+    "Permission.TenantSettings": "Tenant Settings",
+    "Permission.TenantSubscription":  "Subscription Management"
+  }
+}

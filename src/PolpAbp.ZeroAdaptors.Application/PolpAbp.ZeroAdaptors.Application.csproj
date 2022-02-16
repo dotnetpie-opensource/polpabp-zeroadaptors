@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>PolpAbp.ZeroAdaptors</RootNamespace>
+    <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>        
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\fwt\src\PolpAbp.Framework.Domain\PolpAbp.Framework.Domain.csproj" />
+    <ProjectReference Include="..\PolpAbp.ZeroAdaptors.Application.Contracts\PolpAbp.ZeroAdaptors.Application.Contracts.csproj" />
+    <ProjectReference Include="..\PolpAbp.ZeroAdaptors.Core\PolpAbp.ZeroAdaptors.Core.csproj" />
+    <ProjectReference Include="..\PolpAbp.ZeroAdaptors.Domain\PolpAbp.ZeroAdaptors.Domain.csproj" />
+  </ItemGroup>
+    
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Account.Application.Contracts" Version="3.3.2" />
+    <PackageReference Include="Volo.Abp.Ddd.Application" Version="3.3.2" />
+    <PackageReference Include="Volo.Abp.Identity.Domain" Version="3.3.2" />
+    <PackageReference Include="Volo.Abp.TenantManagement.Domain" Version="3.3.2" />
+    <PackageReference Include="Volo.Abp.UI.Navigation" Version="3.3.2" />
+    <PackageReference Include="Volo.Abp.Emailing" Version="3.3.2" />
+    <PackageReference Include="Volo.Abp.TextTemplating" Version="3.3.2" />
+    <PackageReference Include="Volo.Abp.PermissionManagement.Domain" Version="3.3.2" />
+  </ItemGroup>
+   
+  <ItemGroup>
+    <EmbeddedResource Include="Emailing\Account\Templates\*.tpl" />
+    <None Remove="Emailing\Account\Templates\*.tpl" />
+  </ItemGroup>        
+    
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="3.1.8" />
+  </ItemGroup>    
+
+</Project>

@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <RootNamespace>PolpAbp.ZeroAdaptors</RootNamespace>        
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PolpAbp.ZeroAdaptors.Core.Shared\PolpAbp.ZeroAdaptors.Core.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

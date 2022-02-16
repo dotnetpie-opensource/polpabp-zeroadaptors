@@ -1,0 +1,11 @@
+﻿{
+  "culture": "zh-Hans",
+  "texts": {
+    "Permission:OrganizationUnits": "机构/部门管理",
+    "Permission:OrganizationUnits_Default": "查看结构/部门",
+    "Permission:OrganizationUnits_ManageOrganizationTree": "机构/部门架构",
+    "Permission:OrganizationUnits_ManageMembers": "机构/部门成员",
+    "Permission:OrganizationUnits_ManageRoles": "机构/部门角色",
+    "Permission:OrganizationUnits_ManagePermissions": "机构/部门权限"
+  }
+}
