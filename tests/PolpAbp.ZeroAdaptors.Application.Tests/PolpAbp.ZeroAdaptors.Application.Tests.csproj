@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+	  <RootNamespace>PolpAbp.ZeroAdaptors</RootNamespace>
+	  <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\fwt\tests\PolpAbp.Framework.Domain.Tests\PolpAbp.Framework.Domain.Tests.csproj" />
+    <ProjectReference Include="..\..\src\PolpAbp.ZeroAdaptors.Application\PolpAbp.ZeroAdaptors.Application.csproj" />
+    <ProjectReference Include="..\PolpAbp.ZeroAdaptors.TestBase\PolpAbp.ZeroAdaptors.TestBase.csproj" />
+  </ItemGroup>
+
+</Project>

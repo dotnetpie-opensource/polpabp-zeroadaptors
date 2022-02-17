@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Dto;
+using PolpAbp.ZeroAdaptors.Authorization.Users.Events;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Profile.Dto;
 using Volo.Abp;
+using Volo.Abp.EventBus.Local;
+using IdentityUserManager = Volo.Abp.Identity.IdentityUserManager;
 
 namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
 {
@@ -10,19 +15,50 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
     [RemoteService(false)]
     public class ProfileAppService : ZeroAdaptorsAppService, IProfileAppService
     {
+        protected readonly IdentityUserManager IdentityUserManager;
+        protected readonly ILocalEventBus LocalEventBus;
+
+        public ProfileAppService(IdentityUserManager identityUserManager, 
+            ILocalEventBus localEventBus)
+        {
+            IdentityUserManager = identityUserManager;
+            LocalEventBus = localEventBus;
+        }
+
         public Task ChangeLanguage(ChangeUserLanguageDto input)
         {
             throw new NotImplementedException();
         }
 
-        public Task ChangePassword(ChangePasswordInput input)
+        public async Task<IdentityResult> ChangePasswordAsync(ChangePasswordInput input)
         {
-            throw new NotImplementedException();
+            var user = await IdentityUserManager.GetByIdAsync(CurrentUser.Id.Value);
+            var ret = await IdentityUserManager.ChangePasswordAsync(user, input.CurrentPassword, input.NewPassword);
+            if (ret.Succeeded)
+            {
+                await LocalEventBus.PublishAsync(
+                    new PasswordChangedEvent
+                    {
+                        TenantId = user.TenantId,
+                        UserId = user.Id
+                    });
+            }
+            return ret;
         }
 
-        public Task<CurrentUserProfileEditDto> GetCurrentUserProfileForEdit()
+        public async Task<CurrentUserProfileEditDto> GetCurrentUserProfileForEditAsync()
         {
-            throw new NotImplementedException();
+            var user = await IdentityUserManager.GetByIdAsync(CurrentUser.Id.Value);
+            // todo: Move to automap?
+            return new CurrentUserProfileEditDto
+            {
+                EmailAddress = user.Email,
+                UserName = user.UserName,
+                Surname = user.Surname,
+                Name = user.Name,
+                PhoneNumber = user.PhoneNumber,
+                IsPhoneNumberConfirmed = user.PhoneNumberConfirmed
+            };
         }
 
         public Task<GetProfilePictureOutput> GetFriendProfilePictureById(GetFriendProfilePictureByIdInput input)
@@ -30,7 +66,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
             throw new NotImplementedException();
         }
 
-        public Task<GetPasswordComplexitySettingOutput> GetPasswordComplexitySetting()
+        public Task<GetPasswordComplexitySettingOutput> GetPasswordComplexitySettingAsync()
         {
             return Task.Run(() =>
             {
@@ -61,9 +97,43 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
             throw new NotImplementedException();
         }
 
-        public Task UpdateCurrentUserProfile(CurrentUserProfileEditDto input)
+        public async Task UpdateCurrentUserProfileAsync(CurrentUserProfileEditDto input)
         {
-            throw new NotImplementedException();
+            var user = await IdentityUserManager.GetByIdAsync(CurrentUser.Id.Value);
+            var changed = new ProfileChangedEvent
+            {
+                TenantId = user.TenantId,
+                UserId = user.Id
+            };
+            // Update user name
+            if (!string.Equals(user.UserName, input.UserName, StringComparison.OrdinalIgnoreCase))
+            {
+                await IdentityUserManager.SetUserNameAsync(user, input.UserName);
+                changed.ChangedFields.Add(nameof(user.UserName));
+            }
+            if (!string.Equals(user.Email, input.EmailAddress, StringComparison.OrdinalIgnoreCase))
+            {
+                await IdentityUserManager.SetEmailAsync(user, input.EmailAddress);
+                changed.ChangedFields.Add(nameof(user.Email));
+            }
+            if (!string.IsNullOrEmpty(input.PhoneNumber))
+            {
+                user.SetPhoneNumber(input.PhoneNumber, input.IsPhoneNumberConfirmed);
+                changed.ChangedFields.Add(nameof(user.PhoneNumber));
+            }
+            if (!string.Equals(user.Name, input.Name))
+            {
+                user.Name = input.Name;
+                changed.ChangedFields.Add(nameof(user.Name));
+            }
+            if (!string.Equals(user.Surname, input.Surname))
+            {
+                user.Surname = input.Surname;
+                changed.ChangedFields.Add(nameof(user.Surname));
+            }
+
+            await IdentityUserManager.UpdateAsync(user);
+            await LocalEventBus.PublishAsync(changed);
         }
 
         public Task<UpdateGoogleAuthenticatorKeyOutput> UpdateGoogleAuthenticatorKey()
