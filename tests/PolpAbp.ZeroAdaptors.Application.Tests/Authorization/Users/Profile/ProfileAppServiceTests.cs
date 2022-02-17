@@ -49,7 +49,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
             var info = await _profileAppService.GetCurrentUserProfileForEditAsync();
             info.UserName = "another@gmail.com";
             info.EmailAddress = "another@gmail.com";
-            info.PhoneNumber = "5026578157";
+            info.PhoneNumber = "5555555555";
             info.Surname = "Hello";
             info.Name = "World";
             await _profileAppService.UpdateCurrentUserProfileAsync(info);
