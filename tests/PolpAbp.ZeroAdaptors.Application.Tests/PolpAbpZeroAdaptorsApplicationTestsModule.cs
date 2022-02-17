@@ -7,7 +7,7 @@ using PolpAbp.Framework;
 namespace PolpAbp.ZeroAdaptors
 {
     [DependsOn(
-        typeof(FrameworkDomainTestsModule),
+        typeof(PolpAbpFrameworkDomainTestsModule),
         typeof(PolpAbpZeroAdaptorsTestBaseModule),
         typeof(PolpAbpZeroAdaptorsApplicationModule)
         )]

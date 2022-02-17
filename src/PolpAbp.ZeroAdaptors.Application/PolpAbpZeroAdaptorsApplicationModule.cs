@@ -14,7 +14,7 @@ using Volo.Abp.VirtualFileSystem;
 namespace PolpAbp.ZeroAdaptors
 {
     [DependsOn(
-        typeof(FrameworkDomainModule),
+        typeof(PolpAbpFrameworkDomainModule),
         typeof(PolpAbpZeroAdaptorsDomainModule),
         typeof(PolpAbpZeroAdaptorsCoreSharedModule),
         typeof(PolpAbpZeroAdaptorsApplicationContactsModule),

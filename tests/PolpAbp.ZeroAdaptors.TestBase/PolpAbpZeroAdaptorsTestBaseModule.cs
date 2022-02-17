@@ -4,7 +4,7 @@ using Volo.Abp.Modularity;
 namespace PolpAbp.ZeroAdaptors
 {
     [DependsOn(
-        typeof(FrameworkTestBaseModule),
+        typeof(PolpAbpFrameworkTestBaseModule),
         typeof(PolpAbpZeroAdaptorsDomainModule)
         )]
     public class PolpAbpZeroAdaptorsTestBaseModule : AbpModule
