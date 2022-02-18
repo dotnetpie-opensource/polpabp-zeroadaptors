@@ -44,8 +44,15 @@ push:
 	@echo "Push to GitHub"
 	git push
 
-Update-packages:
-	dnt update-packages PolpAbp.Framework.Domain $(Version)
-	dnt update-packages PolpAbp.Framework.Core.Shared $(Version)
+update-packages:
+	@echo "Replace project references with packages"
+ifndef Version
+	@echo "Please provide a version with Version=1.xx"
+else
+	dotnet remove src/PolpAbp.ZeroAdaptors.Application/PolpAbp.ZeroAdaptors.Application.csproj reference ..\..\..\fwt\src\PolpAbp.Framework.Domain\PolpAbp.Framework.Domain.csproj
+	dotnet remove src/PolpAbp.ZeroAdaptors.Application.Contracts/PolpAbp.ZeroAdaptors.Application.Contracts.csproj reference ..\..\..\fwt\src\PolpAbp.Framework.Core.Shared\PolpAbp.Framework.Core.Shared.csproj
+	dotnet add src/PolpAbp.ZeroAdaptors.Application/PolpAbp.ZeroAdaptors.Application.csproj package PolpAbp.Framework.Domain -v $(Version)
+	dotnet add src/PolpAbp.ZeroAdaptors.Application.Contracts/PolpAbp.ZeroAdaptors.Application.Contracts.csproj package PolpAbp.Framework.Core.Shared -v $(Version)
+endif
 
-.PHONY: build pre-build clean push
+.PHONY: build pre-build clean push update-packages
