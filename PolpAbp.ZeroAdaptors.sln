@@ -1,0 +1,73 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32126.317
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolpAbp.ZeroAdaptors.Core", "src\PolpAbp.ZeroAdaptors.Core\PolpAbp.ZeroAdaptors.Core.csproj", "{795B01F7-1A74-4702-9D2F-39D01EB1B1EF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolpAbp.ZeroAdaptors.Core.Shared", "src\PolpAbp.ZeroAdaptors.Core.Shared\PolpAbp.ZeroAdaptors.Core.Shared.csproj", "{040479C8-5EAF-44FB-9AD2-8D3409D8A92C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolpAbp.ZeroAdaptors.Domain", "src\PolpAbp.ZeroAdaptors.Domain\PolpAbp.ZeroAdaptors.Domain.csproj", "{670E2245-1F41-4A0C-815B-38F0FB460CE1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolpAbp.ZeroAdaptors.Application.Contracts", "src\PolpAbp.ZeroAdaptors.Application.Contracts\PolpAbp.ZeroAdaptors.Application.Contracts.csproj", "{5CACC4C3-F14F-4E00-B4F6-CE8497A1B1F2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolpAbp.ZeroAdaptors.Application", "src\PolpAbp.ZeroAdaptors.Application\PolpAbp.ZeroAdaptors.Application.csproj", "{5992096D-1E75-434A-8966-D88856021BF5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolpAbp.Framework.TestBase", "..\fwt\tests\PolpAbp.Framework.TestBase\PolpAbp.Framework.TestBase.csproj", "{5103DEF4-7D61-478A-9BA4-8B5709BC6FA6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolpAbp.Framework.EntityFrameworkCore.Tests", "..\fwt\tests\PolpAbp.Framework.EntityFrameworkCore.Tests\PolpAbp.Framework.EntityFrameworkCore.Tests.csproj", "{17E512C6-BEC2-4CEE-9105-85E1C95E93FB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolpAbp.Framework.Domain.Tests", "..\fwt\tests\PolpAbp.Framework.Domain.Tests\PolpAbp.Framework.Domain.Tests.csproj", "{8B69D209-F897-4BB6-92DB-FFBC2C7E12B2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PolpAbp.Framework.Application.Tests", "..\fwt\tests\PolpAbp.Framework.Application.Tests\PolpAbp.Framework.Application.Tests.csproj", "{87A0D39C-2FDE-4D02-8892-256A846A662B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{795B01F7-1A74-4702-9D2F-39D01EB1B1EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{795B01F7-1A74-4702-9D2F-39D01EB1B1EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{795B01F7-1A74-4702-9D2F-39D01EB1B1EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{795B01F7-1A74-4702-9D2F-39D01EB1B1EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{040479C8-5EAF-44FB-9AD2-8D3409D8A92C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{040479C8-5EAF-44FB-9AD2-8D3409D8A92C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{040479C8-5EAF-44FB-9AD2-8D3409D8A92C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{040479C8-5EAF-44FB-9AD2-8D3409D8A92C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{670E2245-1F41-4A0C-815B-38F0FB460CE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{670E2245-1F41-4A0C-815B-38F0FB460CE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{670E2245-1F41-4A0C-815B-38F0FB460CE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{670E2245-1F41-4A0C-815B-38F0FB460CE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CACC4C3-F14F-4E00-B4F6-CE8497A1B1F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CACC4C3-F14F-4E00-B4F6-CE8497A1B1F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CACC4C3-F14F-4E00-B4F6-CE8497A1B1F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CACC4C3-F14F-4E00-B4F6-CE8497A1B1F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5992096D-1E75-434A-8966-D88856021BF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5992096D-1E75-434A-8966-D88856021BF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5992096D-1E75-434A-8966-D88856021BF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5992096D-1E75-434A-8966-D88856021BF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5103DEF4-7D61-478A-9BA4-8B5709BC6FA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5103DEF4-7D61-478A-9BA4-8B5709BC6FA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5103DEF4-7D61-478A-9BA4-8B5709BC6FA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5103DEF4-7D61-478A-9BA4-8B5709BC6FA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17E512C6-BEC2-4CEE-9105-85E1C95E93FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17E512C6-BEC2-4CEE-9105-85E1C95E93FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17E512C6-BEC2-4CEE-9105-85E1C95E93FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17E512C6-BEC2-4CEE-9105-85E1C95E93FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B69D209-F897-4BB6-92DB-FFBC2C7E12B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B69D209-F897-4BB6-92DB-FFBC2C7E12B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B69D209-F897-4BB6-92DB-FFBC2C7E12B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B69D209-F897-4BB6-92DB-FFBC2C7E12B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87A0D39C-2FDE-4D02-8892-256A846A662B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87A0D39C-2FDE-4D02-8892-256A846A662B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87A0D39C-2FDE-4D02-8892-256A846A662B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87A0D39C-2FDE-4D02-8892-256A846A662B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D5D4F4AA-776B-4927-970A-24BFE4E13B1F}
+	EndGlobalSection
+EndGlobal

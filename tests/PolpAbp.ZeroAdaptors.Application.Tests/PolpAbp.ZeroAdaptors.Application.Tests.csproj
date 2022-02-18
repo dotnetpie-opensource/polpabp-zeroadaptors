@@ -10,10 +10,10 @@
 
   <ItemGroup>
 	  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
+	  <PackageReference Include="PolpAbp.Framework.Domain.Tests" Version="3.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\fwt\tests\PolpAbp.Framework.Domain.Tests\PolpAbp.Framework.Domain.Tests.csproj" />
     <ProjectReference Include="..\..\src\PolpAbp.ZeroAdaptors.Application\PolpAbp.ZeroAdaptors.Application.csproj" />
     <ProjectReference Include="..\PolpAbp.ZeroAdaptors.TestBase\PolpAbp.ZeroAdaptors.TestBase.csproj" />
   </ItemGroup>
