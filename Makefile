@@ -56,7 +56,7 @@ else
 	dotnet remove tests/PolpAbp.ZeroAdaptors.TestBase/PolpAbp.ZeroAdaptors.TestBase.csproj reference ..\..\..\fwt\tests\PolpAbp.Framework.TestBase\PolpAbp.Framework.TestBase.csproj
 	dotnet add tests/PolpAbp.ZeroAdaptors.TestBase/PolpAbp.ZeroAdaptors.TestBase.csproj package PolpAbp.Framework.TestBase -v $(Version)
 	dotnet remove tests/PolpAbp.ZeroAdaptors.Application.Tests/PolpAbp.ZeroAdaptors.Application.Tests.csproj reference ..\..\..\fwt\tests\PolpAbp.Framework.Domain.Tests\PolpAbp.Framework.Domain.Tests.csproj
-	dotnet add tests/PolpAbp.ZeroAdaptors.Application.Tests/PolpAbp.ZeroAdaptors.Application.Tests.csproj package PolpAbp.Framework.Domain.Tests
+	dotnet add tests/PolpAbp.ZeroAdaptors.Application.Tests/PolpAbp.ZeroAdaptors.Application.Tests.csproj package PolpAbp.Framework.Domain.Tests -v $(Version)
 endif
 
 .PHONY: build pre-build clean push update-packages
