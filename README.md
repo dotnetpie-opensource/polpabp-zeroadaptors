@@ -14,7 +14,7 @@ Switch to main branch.
 4. Run (cygwin)
 > bump version
 5. Run (cygwin)
-> gulp
+> gulp (or npm run bump)
 6. Run (cygwin)
 > make clean
 7. Run (powershell)
