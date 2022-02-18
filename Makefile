@@ -44,4 +44,8 @@ push:
 	@echo "Push to GitHub"
 	git push
 
+Update-packages:
+	dnt update-packages PolpAbp.Framework.Domain $(Version)
+	dnt update-packages PolpAbp.Framework.Core.Shared $(Version)
+
 .PHONY: build pre-build clean push
