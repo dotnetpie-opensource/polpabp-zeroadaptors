@@ -7,6 +7,7 @@ using PolpAbp.ZeroAdaptors.Authorization.Accounts.Dto;
 using PolpAbp.ZeroAdaptors.Authorization.Permissions;
 using PolpAbp.ZeroAdaptors.Authorization.Permissions.Dto;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Dto;
+using PolpAbp.ZeroAdaptors.Authorization.Users.Events;
 using PolpAbp.ZeroAdaptors.Organizations.Dto;
 using PolpAbp.ZeroAdaptors.Security;
 using System;
@@ -14,6 +15,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.Data;
+using Volo.Abp.EventBus.Local;
 using Volo.Abp.Identity;
 
 namespace PolpAbp.ZeroAdaptors.Authorization.Users
@@ -22,15 +25,16 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
     public class UserAppService : ZeroAdaptorsAppService, IUserAppService
     {
 
-        private readonly IIdentityRoleRepository _identityRoleRepository;
-        private readonly IOrganizationUnitRepository _organizationUnitRepository;
-        private readonly IdentityUserManager _identityUserManager;
-        private readonly IIdentityUserRepository _identityUserRepository;
-        private readonly IAccountAppService _accountAppService;
-        private readonly IRegisteredUserDataSeeder _registeredUserDataSeeder;
-        private readonly ISystemPermissionAppService _systemPermissionAppService;
-        private readonly IUserPermissionAppService _userPermissionAppService;
-        private readonly IStringLocalizerFactory _stringLocalizerFactory;
+        protected readonly IIdentityRoleRepository IdentityRoleRepository;
+        protected readonly IOrganizationUnitRepository OrganizationUnitRepository;
+        protected readonly IdentityUserManager IdentityUserManager;
+        protected readonly IIdentityUserRepository IdentityUserRepository;
+        protected readonly IAccountAppService AccountAppService;
+        protected readonly IRegisteredUserDataSeeder RegisteredUserDataSeeder;
+        protected readonly ISystemPermissionAppService SystemPermissionAppService;
+        protected readonly IUserPermissionAppService UserPermissionAppService;
+        protected readonly ILocalEventBus LocalEventBus;
+        protected readonly IUserIdentityAssistantAppService UserIdentityAssistantAppService;
 
         public UserAppService(IIdentityRoleRepository identityRoleRepository,
             IOrganizationUnitRepository organizationUnitRepository,
@@ -40,24 +44,26 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             IRegisteredUserDataSeeder registeredUserDataSeeder,
             ISystemPermissionAppService systemPermissionAppService,
             IUserPermissionAppService userPermissionAppService,
-            IStringLocalizerFactory stringLocalizerFactory
+            ILocalEventBus localEventBus,
+            IUserIdentityAssistantAppService userIdentityAssistantAppService
             )
         {
-            _identityRoleRepository = identityRoleRepository;
-            _organizationUnitRepository = organizationUnitRepository;
-            _identityUserManager = identityUserManager;
-            _identityUserRepository = identityUserRepository;
-            _accountAppService = accountAppService;
-            _registeredUserDataSeeder = registeredUserDataSeeder;
-            _systemPermissionAppService = systemPermissionAppService;
-            _userPermissionAppService = userPermissionAppService;
-            _stringLocalizerFactory = stringLocalizerFactory;
+            IdentityRoleRepository = identityRoleRepository;
+            OrganizationUnitRepository = organizationUnitRepository;
+            IdentityUserManager = identityUserManager;
+            IdentityUserRepository = identityUserRepository;
+            AccountAppService = accountAppService;
+            RegisteredUserDataSeeder = registeredUserDataSeeder;
+            SystemPermissionAppService = systemPermissionAppService;
+            UserPermissionAppService = userPermissionAppService;
+            LocalEventBus = localEventBus;
+            UserIdentityAssistantAppService = userIdentityAssistantAppService;
         }
 
         [Authorize(IdentityPermissions.Users.Create)]
-        public async Task<GetUserForEditOutput> GetUserForEditAsync()
+        public async Task<GetUserForEditOutput> GetUserForCreateAsync()
         {
-            var roles = await _identityRoleRepository.GetListAsync();
+            var roles = await IdentityRoleRepository.GetListAsync();
             var userRoleDtos = roles.OrderBy(x => x.NormalizedName)
                 .Select(r => new UserRoleDto
                 {
@@ -67,7 +73,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                 })
                 .ToArray();
 
-            var allOrganizationUnits = await _organizationUnitRepository.GetListAsync();
+            var allOrganizationUnits = await OrganizationUnitRepository.GetListAsync();
             var ouDtos = allOrganizationUnits
                 .Select(x => ObjectMapper.Map<OrganizationUnit, OrganizationUnitDto>(x))
                 .ToList();
@@ -102,7 +108,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
         [Authorize(IdentityPermissions.Users.Update)]
         public async Task<GetUserForEditOutput> GetUserForEditAsync(Guid input)
         {
-            var roles = await _identityRoleRepository.GetListAsync();
+            var roles = await IdentityRoleRepository.GetListAsync();
             var userRoleDtos = roles.OrderBy(x => x.NormalizedName)
                 .Select(r => new UserRoleDto
                 {
@@ -112,7 +118,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                 })
                 .ToArray();
 
-            var allOrganizationUnits = await _organizationUnitRepository.GetListAsync();
+            var allOrganizationUnits = await OrganizationUnitRepository.GetListAsync();
             var ouDtos = allOrganizationUnits
                 .Select(x => ObjectMapper.Map<OrganizationUnit, OrganizationUnitDto>(x))
                 .ToList();
@@ -125,7 +131,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             };
 
             //Editing an existing user
-            var user = await _identityUserManager.GetByIdAsync(input);
+            var user = await IdentityUserManager.GetByIdAsync(input);
 
             output.User = new UserEditDto
             {
@@ -135,25 +141,28 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                 Name = user.Name,
                 Surname = user.Surname,
                 UserName = user.UserName,
-                PhoneNumber = user.PhoneNumber
+                PhoneNumber = user.PhoneNumber,
+                IsTwoFactorEnabled = user.TwoFactorEnabled,
+                IsLockoutEnabled = user.LockoutEnabled,
+                ShouldChangePasswordOnNextLogin = user.GetProperty<bool>(nameof(UserEditDto.ShouldChangePasswordOnNextLogin), false)
                 // todo:
                 // isactive
                 // ....
             };
 
-            var organizationUnits = await _identityUserManager.GetOrganizationUnitsAsync(user);
+            var organizationUnits = await IdentityUserManager.GetOrganizationUnitsAsync(user);
             output.MemberedOrganizationUnits = organizationUnits.Select(ou => ou.Code).ToList();
 
             var allRolesOfUsersOrganizationUnits = new List<string>();
             foreach (var o in organizationUnits)
             {
-                var rs = await _identityUserRepository.GetRoleNamesInOrganizationUnitAsync(o.Id);
+                var rs = await IdentityUserRepository.GetRoleNamesInOrganizationUnitAsync(o.Id);
                 allRolesOfUsersOrganizationUnits.AddRange(rs);
             }
 
             foreach (var userRoleDto in userRoleDtos)
             {
-                userRoleDto.IsAssigned = await _identityUserManager.IsInRoleAsync(user, userRoleDto.RoleName);
+                userRoleDto.IsAssigned = await IdentityUserManager.IsInRoleAsync(user, userRoleDto.RoleName);
                 userRoleDto.InheritedFromOrganizationUnit = allRolesOfUsersOrganizationUnits.Contains(userRoleDto.RoleName);
             }
             return output;
@@ -180,6 +189,11 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             else if (!input.User.Password.IsNullOrEmpty())
             {
                 // todo: Validate the password???
+                var validatedRet = await UserIdentityAssistantAppService.ValidatePasswordAsync(input.User.Password);
+                if (!validatedRet.Succeeded)
+                {
+                    throw new AbpIdentityResultException(validatedRet);
+                }
             }
 
             var user = new IdentityUser(
@@ -189,26 +203,38 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                CurrentTenant.Id
            );
 
-            (await _identityUserManager.CreateAsync(user, input.User.Password)).CheckErrors();
-            await UpdateUserByInput(user, input.User);
+            var changedEvent = new ProfileChangedEvent();
+            (await IdentityUserManager.CreateAsync(user, input.User.Password)).CheckErrors();
+            await UpdateUserByInput(user, input.User, changedEvent);
 
             await CurrentUnitOfWork.SaveChangesAsync(); // Next make sense to send notifications 
 
             // Add into org.
-            await _identityUserManager.SetOrganizationUnitsAsync(user, input.OrganizationUnits.ToArray());
+            await IdentityUserManager.SetOrganizationUnitsAsync(user, input.OrganizationUnits.ToArray());
 
             // todo: Any seed data ????
             // Next seed data for this user, e.g., user role and so on.
-            await _registeredUserDataSeeder.SeedAsync(input.User.EmailAddress, CurrentTenant.Id);
+            await RegisteredUserDataSeeder.SeedAsync(input.User.EmailAddress, CurrentTenant.Id);
 
             // Emailing 
             if (input.SendActivationEmail)
             {
-                await _accountAppService.SendEmailActivationLink(new SendEmailActivationLinkInput
+                await AccountAppService.SendEmailActivationLink(new SendEmailActivationLinkInput
                 {
                     EmailAddress = input.User.Email
                 });
             }
+
+            // Should change password on next login
+            var passwordChangedEvent = new PasswordChangedEvent()
+            {
+                UserId = user.Id,
+                OperatorId = CurrentUser?.Id,
+                TenantId = CurrentUser.TenantId,
+                NewPassword = input.User.Password
+            };
+
+            await LocalEventBus.PublishAsync(passwordChangedEvent);
 
             return user.Id;
         }
@@ -216,21 +242,24 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
         [Authorize(IdentityPermissions.Users.Update)]
         public async Task UpdateUserAsync(CreateOrUpdateUserInput input)
         {
+            var changedEvent = new ProfileChangedEvent()
+            {
+                OperatorId = CurrentUser?.Id
+            };
+
             // Normalize values so that we can leverage the helper 
             // method to set up roles and other. 
             input.User.Email = input.User.EmailAddress;
             input.User.RoleNames = input.AssignedRoleNames;
 
-            var user = await _identityUserManager.GetByIdAsync(input.User.Id.Value);
+            var user = await IdentityUserManager.GetByIdAsync(input.User.Id.Value);
             // todo: ??
             // user.ConcurrencyStamp = input.ConcurrencyStamp;
-
-            (await _identityUserManager.SetUserNameAsync(user, input.User.UserName)).CheckErrors();
-
-            await UpdateUserByInput(user, input.User);
+            await UpdateUserByInput(user, input.User, changedEvent);
+            // todo: 
             // input.MapExtraPropertiesTo(user);
 
-            (await _identityUserManager.UpdateAsync(user)).CheckErrors();
+            (await IdentityUserManager.UpdateAsync(user)).CheckErrors();
 
             //Set password
             if (input.SetRandomPassword)
@@ -238,47 +267,106 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                 var randomPassword = CreateRandomPassword();
                 input.User.Password = randomPassword;
             }
-            else
-            {
-                // Run validation ????
-            }
-            
-            if (!input.User.Password.IsNullOrEmpty())
+            else if (!input.User.Password.IsNullOrEmpty())
             {
                 // todo: Validate the password???
-                (await _identityUserManager.RemovePasswordAsync(user)).CheckErrors();
-                (await _identityUserManager.AddPasswordAsync(user, input.User.Password)).CheckErrors();
+                var validatedRet = await UserIdentityAssistantAppService.ValidatePasswordAsync(input.User.Password);
+                if (!validatedRet.Succeeded)
+                {
+                    throw new AbpIdentityResultException(validatedRet);
+                }
             }
 
-            await _identityUserManager.SetOrganizationUnitsAsync(user, input.OrganizationUnits.ToArray());
+            PasswordChangedEvent passwordChangedEvent = null;
+
+            if (!input.User.Password.IsNullOrEmpty())
+            {
+                // The following will validate the password.
+                // todo: Validate the password???
+                (await IdentityUserManager.RemovePasswordAsync(user)).CheckErrors();
+                (await IdentityUserManager.AddPasswordAsync(user, input.User.Password)).CheckErrors();
+
+                passwordChangedEvent = new PasswordChangedEvent()
+                {
+                    UserId = user.Id,
+                    OperatorId = CurrentUser?.Id,
+                    TenantId = CurrentUser.TenantId,
+                    NewPassword = input.User.Password
+                };
+            }
+
+            await IdentityUserManager.SetOrganizationUnitsAsync(user, input.OrganizationUnits.ToArray());
 
             await CurrentUnitOfWork.SaveChangesAsync();
 
             // Emailing 
             if (input.SendActivationEmail)
             {
-                await _accountAppService.SendEmailActivationLink(new SendEmailActivationLinkInput
+                await AccountAppService.SendEmailActivationLink(new SendEmailActivationLinkInput
                 {
                     EmailAddress = input.User.Email
                 });
             }
+
+            // Events 
+            if (passwordChangedEvent != null)
+            {
+                await LocalEventBus.PublishAsync(passwordChangedEvent);
+            }
+            await LocalEventBus.PublishAsync(changedEvent);
+        }
+
+        public async Task ResetUserPasswordAsync(Guid id, ResetUserPasswordDto input, bool runValidator)
+        {
+            var user = await IdentityUserManager.GetByIdAsync(id);
+
+            //Set password
+            if (input.SetRandomPassword)
+            {
+                var randomPassword = CreateRandomPassword();
+                input.Password = randomPassword;
+            }
+            else if (runValidator)
+            {
+                // todo: Validate the password???
+                var validatedRet = await UserIdentityAssistantAppService.ValidatePasswordAsync(input.Password);
+                if (!validatedRet.Succeeded)
+                {
+                    throw new AbpIdentityResultException(validatedRet);
+                }
+            }
+
+                // The following will validate the password.
+                // todo: Validate the password???
+                (await IdentityUserManager.RemovePasswordAsync(user)).CheckErrors();
+            (await IdentityUserManager.AddPasswordAsync(user, input.Password)).CheckErrors();
+
+            var passwordChangedEvent = new PasswordChangedEvent()
+            {
+                UserId = user.Id,
+                OperatorId = CurrentUser?.Id,
+                TenantId = CurrentUser.TenantId,
+                NewPassword = input.Password
+            };
+
+            await LocalEventBus.PublishAsync(passwordChangedEvent);
         }
 
         [Authorize(IdentityPermissions.Users.ManagePermissions)]
         public async Task<GetUserPermissionsForEditOutput> GetUserPermissionsForEditAsync(Guid input)
         {
-            var user = await _identityUserManager.GetByIdAsync(input);
+            var user = await IdentityUserManager.GetByIdAsync(input);
 
-            var permDefs = await _systemPermissionAppService.GetAllPermissionsAsync(true /* excluding host */);
+            var permDefs = await SystemPermissionAppService.GetAllPermissionsAsync(true /* excluding host */);
             var permissions = permDefs.Select(x => new FlatPermissionDto
             {
                 Name = x.Name,
                 ParentName = x.Parent?.Name,
-                DisplayName = x.DisplayName.Localize(_stringLocalizerFactory)
+                DisplayName = x.DisplayName.Localize(StringLocalizerFactory)
             }).ToList();
 
             var permNames = permDefs.Select(x => x.Name).ToList();
-            var grantedDefs = await _userPermissionAppService.GetGrantedPermissionsAsync(user, permNames);
+            var grantedDefs = await UserPermissionAppService.GetGrantedPermissionsAsync(user, permNames);
             var grantPermissions = grantedDefs.Select(x => x).ToList();
                 
             return new GetUserPermissionsForEditOutput
@@ -291,24 +379,24 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
         [Authorize(IdentityPermissions.Users.ManagePermissions)]
         public async Task UpdateUserPermissionsAsync(UpdateUserPermissionsInput input)
         {
-            var user = await _identityUserManager.GetByIdAsync(input.Id);
+            var user = await IdentityUserManager.GetByIdAsync(input.Id);
             var normlizedPermissions = input.GrantedPermissionNames
                 .Select(x => x).ToList();
 
-            await _userPermissionAppService.SetGrantedPermissionsAsync(user, normlizedPermissions);
+            await UserPermissionAppService.SetGrantedPermissionsAsync(user, normlizedPermissions);
         }
 
         [Authorize(IdentityPermissions.Users.ManagePermissions)]
         public async Task ResetUserSpecificPermissionsAsync(Guid id)
         {
-            var user = await _identityUserManager.GetByIdAsync(id);
+            var user = await IdentityUserManager.GetByIdAsync(id);
             var normlizedPermissions = new List<string>();
 
-            await _userPermissionAppService.SetGrantedPermissionsAsync(user, normlizedPermissions);
+            await UserPermissionAppService.SetGrantedPermissionsAsync(user, normlizedPermissions);
         }
 
 
-        protected string CreateRandomPassword()
+        public string CreateRandomPassword()
         {
             // todo: Read from settings
             var passwordComplexitySetting = new PasswordComplexitySetting();
@@ -362,26 +450,48 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             return new string(chars.ToArray());
         }
 
-        protected virtual async Task UpdateUserByInput(IdentityUser user, UserEditDto input)
+        protected virtual async Task UpdateUserByInput(IdentityUser user, UserEditDto input, ProfileChangedEvent changedEvent)
         {
+            if (!string.Equals(user.UserName, input.UserName, StringComparison.OrdinalIgnoreCase))
+            {
+                (await IdentityUserManager.SetUserNameAsync(user, input.UserName)).CheckErrors();
+                changedEvent.ChangedFields.Add(nameof(user.UserName));
+            }
             if (!string.Equals(user.Email, input.Email, StringComparison.InvariantCultureIgnoreCase))
             {
-                (await _identityUserManager.SetEmailAsync(user, input.Email)).CheckErrors();
+                (await IdentityUserManager.SetEmailAsync(user, input.Email)).CheckErrors();
+                changedEvent.ChangedFields.Add(nameof(user.Email));
             }
-
             if (!string.Equals(user.PhoneNumber, input.PhoneNumber, StringComparison.InvariantCultureIgnoreCase))
             {
-                (await _identityUserManager.SetPhoneNumberAsync(user, input.PhoneNumber)).CheckErrors();
+                (await IdentityUserManager.SetPhoneNumberAsync(user, input.PhoneNumber)).CheckErrors();
+                changedEvent.ChangedFields.Add(nameof(user.PhoneNumber));
+            }
+            if (!string.Equals(user.Name, input.Name))
+            {
+                user.Name = input.Name;
+                changedEvent.ChangedFields.Add(nameof(user.Name));
+            }
+            if (!string.Equals(user.Surname, input.Surname))
+            {
+                user.Surname = input.Surname;
+                changedEvent.ChangedFields.Add(nameof(user.Surname));
             }
 
-            (await _identityUserManager.SetLockoutEnabledAsync(user, input.LockoutEnabled)).CheckErrors();
-
-            user.Name = input.Name;
-            user.Surname = input.Surname;
+            (await IdentityUserManager.SetLockoutEnabledAsync(user, input.LockoutEnabled)).CheckErrors();
 
             if (input.RoleNames != null)
             {
-                (await _identityUserManager.SetRolesAsync(user, input.RoleNames)).CheckErrors();
+                (await IdentityUserManager.SetRolesAsync(user, input.RoleNames)).CheckErrors();
+            }
+
+            if (input.ShouldChangePasswordOnNextLogin)
+            {
+                user.SetProperty(nameof(UserEditDto.ShouldChangePasswordOnNextLogin), input.ShouldChangePasswordOnNextLogin);
+            }
+            else
+            {
+                user.RemoveProperty(nameof(UserEditDto.ShouldChangePasswordOnNextLogin));
             }
         }
     }

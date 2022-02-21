@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Volo.Abp.Auditing;
 using Volo.Abp.Identity;
@@ -23,6 +24,10 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Dto
         public string Name { get; set; }
         [DynamicStringLength(typeof(IdentityUserConsts), "MaxSurnameLength", null)]
         public string Surname { get; set; }
+        /// <summary>
+        /// Please use EmailAddress.
+        /// Email will be internally assinged to be EmailAddress
+        /// </summary>
         [DynamicStringLength(typeof(IdentityUserConsts), "MaxEmailLength", null)]
         public string Email { get; set; }
         [DynamicStringLength(typeof(IdentityUserConsts), "MaxPhoneNumberLength", null)]
@@ -37,6 +42,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Dto
 
         [Required]
         [EmailAddress]
+        [DynamicStringLength(typeof(IdentityUserConsts), "MaxEmailLength", null)]
         public string EmailAddress { get; set; }
 
         public bool IsActive { get; set; }
@@ -46,5 +52,12 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Dto
         public virtual bool IsTwoFactorEnabled { get; set; }
 
         public virtual bool IsLockoutEnabled { get; set; }
+
+        public Dictionary<string, Object> ExtraProperties { get; set; }
+
+        public UserEditDto()
+        {
+            ExtraProperties = new Dictionary<string, object>();
+        }
     }
 }

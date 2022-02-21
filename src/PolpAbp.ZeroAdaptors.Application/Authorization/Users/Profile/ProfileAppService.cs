@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Dto;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Events;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Profile.Dto;
+using PolpAbp.ZeroAdaptors.Security;
 using Volo.Abp;
 using Volo.Abp.EventBus.Local;
 using IdentityUserManager = Volo.Abp.Identity.IdentityUserManager;
@@ -72,7 +73,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
             {
                 // TODO: Read from setting manager
                 var output = new GetPasswordComplexitySettingOutput();
-                output.Setting = new PolpAbp.ZeroAdaptors.Security.PasswordComplexitySetting();
+                output.Setting = PasswordComplexitySetting.DefaultSettings;
                 return output;
             });
         }
@@ -100,7 +101,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
         public async Task UpdateCurrentUserProfileAsync(CurrentUserProfileEditDto input)
         {
             var user = await IdentityUserManager.GetByIdAsync(CurrentUser.Id.Value);
-            var changed = new ProfileChangedEvent
+            var changedEvent = new ProfileChangedEvent
             {
                 TenantId = user.TenantId,
                 UserId = user.Id
@@ -108,32 +109,32 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
             // Update user name
             if (!string.Equals(user.UserName, input.UserName, StringComparison.OrdinalIgnoreCase))
             {
-                await IdentityUserManager.SetUserNameAsync(user, input.UserName);
-                changed.ChangedFields.Add(nameof(user.UserName));
+                (await IdentityUserManager.SetUserNameAsync(user, input.UserName)).CheckErrors();
+                changedEvent.ChangedFields.Add(nameof(user.UserName));
             }
             if (!string.Equals(user.Email, input.EmailAddress, StringComparison.OrdinalIgnoreCase))
             {
-                await IdentityUserManager.SetEmailAsync(user, input.EmailAddress);
-                changed.ChangedFields.Add(nameof(user.Email));
+                (await IdentityUserManager.SetEmailAsync(user, input.EmailAddress)).CheckErrors();
+                changedEvent.ChangedFields.Add(nameof(user.Email));
             }
             if (!string.IsNullOrEmpty(input.PhoneNumber))
             {
-                user.SetPhoneNumber(input.PhoneNumber, input.IsPhoneNumberConfirmed);
-                changed.ChangedFields.Add(nameof(user.PhoneNumber));
+                (await IdentityUserManager.SetPhoneNumberAsync(user, input.PhoneNumber)).CheckErrors();
+                changedEvent.ChangedFields.Add(nameof(user.PhoneNumber));
             }
             if (!string.Equals(user.Name, input.Name))
             {
                 user.Name = input.Name;
-                changed.ChangedFields.Add(nameof(user.Name));
+                changedEvent.ChangedFields.Add(nameof(user.Name));
             }
             if (!string.Equals(user.Surname, input.Surname))
             {
                 user.Surname = input.Surname;
-                changed.ChangedFields.Add(nameof(user.Surname));
+                changedEvent.ChangedFields.Add(nameof(user.Surname));
             }
 
-            await IdentityUserManager.UpdateAsync(user);
-            await LocalEventBus.PublishAsync(changed);
+            (await IdentityUserManager.UpdateAsync(user)).CheckErrors();
+            await LocalEventBus.PublishAsync(changedEvent);
         }
 
         public Task<UpdateGoogleAuthenticatorKeyOutput> UpdateGoogleAuthenticatorKey()
