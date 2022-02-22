@@ -50,10 +50,8 @@ ifndef Version
 	@echo "Please provide a version with Version=1.xx"
 else
 	dotnet remove src/PolpAbp.ZeroAdaptors.Application/PolpAbp.ZeroAdaptors.Application.csproj reference ..\..\..\fwt\src\PolpAbp.Framework.Application\PolpAbp.Framework.Application.csproj
-	dotnet remove src/PolpAbp.ZeroAdaptors.Application.Contracts/PolpAbp.ZeroAdaptors.Application.Contracts.csproj reference ..\..\..\fwt\src\PolpAbp.Framework.Core.Shared\PolpAbp.Framework.Core.Shared.csproj
 	dotnet remove src/PolpAbp.ZeroAdaptors.Application.Contracts/PolpAbp.ZeroAdaptors.Application.Contracts.csproj reference ..\..\..\fwt\src\PolpAbp.Framework.Application.Contracts\PolpAbp.Framework.Application.Contracts.csproj
 	dotnet add src/PolpAbp.ZeroAdaptors.Application/PolpAbp.ZeroAdaptors.Application.csproj package PolpAbp.Framework.Application -v $(Version)
-	dotnet add src/PolpAbp.ZeroAdaptors.Application.Contracts/PolpAbp.ZeroAdaptors.Application.Contracts.csproj package PolpAbp.Framework.Core.Shared -v $(Version)
 	dotnet add src/PolpAbp.ZeroAdaptors.Application.Contracts/PolpAbp.ZeroAdaptors.Application.Contracts.csproj package PolpAbp.Framework.Application.Contracts -v $(Version)
 	dotnet remove tests/PolpAbp.ZeroAdaptors.TestBase/PolpAbp.ZeroAdaptors.TestBase.csproj reference ..\..\..\fwt\tests\PolpAbp.Framework.TestBase\PolpAbp.Framework.TestBase.csproj
 	dotnet add tests/PolpAbp.ZeroAdaptors.TestBase/PolpAbp.ZeroAdaptors.TestBase.csproj package PolpAbp.Framework.TestBase -v $(Version)
