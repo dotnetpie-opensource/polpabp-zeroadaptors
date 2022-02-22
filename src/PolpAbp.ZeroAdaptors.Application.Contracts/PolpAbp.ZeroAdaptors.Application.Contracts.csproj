@@ -9,7 +9,8 @@
   </PropertyGroup>
     
   <ItemGroup>
-	<PackageReference Include="PolpAbp.Framework.Core.Shared" Version="3.1.0" />
+	<PackageReference Include="PolpAbp.Framework.Application.Contracts" Version="3.1.1" />
+	<PackageReference Include="PolpAbp.Framework.Core.Shared" Version="3.1.1" />
 	<PackageReference Include="Polpware.ComponentModel.DataAnnotations" Version="1.0.0" />
 	<PackageReference Include="Volo.Abp.Authorization" Version="3.3.2" />
     <PackageReference Include="Volo.Abp.Core" Version="3.3.2" />
@@ -23,7 +24,6 @@
   </ItemGroup> 
       
   <ItemGroup>
-    <ProjectReference Include="..\..\..\fwt\src\PolpAbp.Framework.Application.Contracts\PolpAbp.Framework.Application.Contracts.csproj" />
     <ProjectReference Include="..\PolpAbp.ZeroAdaptors.Core.Shared\PolpAbp.ZeroAdaptors.Core.Shared.csproj" />
   </ItemGroup>
 
