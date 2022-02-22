@@ -29,7 +29,8 @@ namespace PolpAbp.ZeroAdaptors
                 {
                     new Claim(AbpClaimTypes.UserId, FrameworkTestConsts.AdminId.ToString()),
                     new Claim(AbpClaimTypes.TenantId, FrameworkTestConsts.TenantId.ToString()),
-                    new Claim(AbpClaimTypes.UserName, "admin")
+                    new Claim(AbpClaimTypes.UserName, "admin"),
+                    new Claim(AbpClaimTypes.Role, "admin")
                 }
             ));
 
