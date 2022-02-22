@@ -1,15 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Localization;
 using PolpAbp.Framework.Identity;
-using PolpAbp.ZeroAdaptors.Authorization.Accounts;
-using PolpAbp.ZeroAdaptors.Authorization.Accounts.Dto;
 using PolpAbp.ZeroAdaptors.Authorization.Permissions;
 using PolpAbp.ZeroAdaptors.Authorization.Permissions.Dto;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Dto;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Events;
 using PolpAbp.ZeroAdaptors.Organizations.Dto;
-using PolpAbp.ZeroAdaptors.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +14,7 @@ using Volo.Abp;
 using Volo.Abp.Data;
 using Volo.Abp.EventBus.Local;
 using Volo.Abp.Identity;
+using IdentityUser = Volo.Abp.Identity.IdentityUser;
 
 namespace PolpAbp.ZeroAdaptors.Authorization.Users
 {
