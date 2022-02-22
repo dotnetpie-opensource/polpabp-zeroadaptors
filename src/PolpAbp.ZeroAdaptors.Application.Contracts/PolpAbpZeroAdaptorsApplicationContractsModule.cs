@@ -17,7 +17,6 @@ namespace PolpAbp.ZeroAdaptors
 {
     [DependsOn(
         typeof(PolpAbpFrameworkApplicationContractsModule),
-        typeof(PolpAbpFrameworkCoreSharedModule),
         typeof(PolpAbpZeroAdaptorsCoreSharedModule),
         typeof(AbpDddApplicationContractsModule),
         typeof(AbpDddDomainModule),
