@@ -29,7 +29,6 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
         protected readonly IOrganizationUnitRepository OrganizationUnitRepository;
         protected readonly IdentityUserManager IdentityUserManager;
         protected readonly IIdentityUserRepository IdentityUserRepository;
-        protected readonly IAccountAppService AccountAppService;
         protected readonly IRegisteredUserDataSeeder RegisteredUserDataSeeder;
         protected readonly ISystemPermissionAppService SystemPermissionAppService;
         protected readonly IUserPermissionAppService UserPermissionAppService;
@@ -40,7 +39,6 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             IOrganizationUnitRepository organizationUnitRepository,
             IdentityUserManager identityUserManager,
             IIdentityUserRepository identityUserRepository,
-            IAccountAppService accountAppService,
             IRegisteredUserDataSeeder registeredUserDataSeeder,
             ISystemPermissionAppService systemPermissionAppService,
             IUserPermissionAppService userPermissionAppService,
@@ -52,7 +50,6 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             OrganizationUnitRepository = organizationUnitRepository;
             IdentityUserManager = identityUserManager;
             IdentityUserRepository = identityUserRepository;
-            AccountAppService = accountAppService;
             RegisteredUserDataSeeder = registeredUserDataSeeder;
             SystemPermissionAppService = systemPermissionAppService;
             UserPermissionAppService = userPermissionAppService;
@@ -136,7 +133,6 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             output.User = new UserEditDto
             {
                 Id = user.Id,
-                Email = user.Email,
                 EmailAddress = user.Email, // Client expect email address
                 Name = user.Name,
                 Surname = user.Surname,
@@ -177,16 +173,15 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
 
             // Normalize values so that we can leverage the helper 
             // method to set up roles and other. 
-            input.User.Email = input.User.EmailAddress;
             input.User.RoleNames = input.AssignedRoleNames;
             //Set password
             if (input.SetRandomPassword)
             {
-                var randomPassword = CreateRandomPassword();
+                var randomPassword = await UserIdentityAssistantAppService.CreateRandomPasswordAsync();
                 // Generated password should conform to our restrication
                 input.User.Password = randomPassword;
             }
-            else if (!input.User.Password.IsNullOrEmpty())
+            else
             {
                 // todo: Validate the password???
                 var validatedRet = await UserIdentityAssistantAppService.ValidatePasswordAsync(input.User.Password);
@@ -219,10 +214,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             // Emailing 
             if (input.SendActivationEmail)
             {
-                await AccountAppService.SendEmailActivationLink(new SendEmailActivationLinkInput
-                {
-                    EmailAddress = input.User.Email
-                });
+                // todo: Send an email
             }
 
             // Should change password on next login
@@ -249,7 +241,6 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
 
             // Normalize values so that we can leverage the helper 
             // method to set up roles and other. 
-            input.User.Email = input.User.EmailAddress;
             input.User.RoleNames = input.AssignedRoleNames;
 
             var user = await IdentityUserManager.GetByIdAsync(input.User.Id.Value);
@@ -264,7 +255,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             //Set password
             if (input.SetRandomPassword)
             {
-                var randomPassword = CreateRandomPassword();
+                var randomPassword = await UserIdentityAssistantAppService.CreateRandomPasswordAsync();
                 input.User.Password = randomPassword;
             }
             else if (!input.User.Password.IsNullOrEmpty())
@@ -302,10 +293,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             // Emailing 
             if (input.SendActivationEmail)
             {
-                await AccountAppService.SendEmailActivationLink(new SendEmailActivationLinkInput
-                {
-                    EmailAddress = input.User.Email
-                });
+                // todo: Send an email
             }
 
             // Events 
@@ -323,7 +311,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             //Set password
             if (input.SetRandomPassword)
             {
-                var randomPassword = CreateRandomPassword();
+                var randomPassword = await UserIdentityAssistantAppService.CreateRandomPasswordAsync();
                 input.Password = randomPassword;
             }
             else if (runValidator)
@@ -395,60 +383,6 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             await UserPermissionAppService.SetGrantedPermissionsAsync(user, normlizedPermissions);
         }
 
-
-        public string CreateRandomPassword()
-        {
-            // todo: Read from settings
-            var passwordComplexitySetting = new PasswordComplexitySetting();
-
-            var upperCaseLetters = "ABCDEFGHJKLMNOPQRSTUVWXYZ";
-            var lowerCaseLetters = "abcdefghijkmnopqrstuvwxyz";
-            var digits = "0123456789";
-            var nonAlphanumerics = "!@$?_-";
-
-            string[] randomChars = {
-                upperCaseLetters,
-                lowerCaseLetters,
-                digits,
-                nonAlphanumerics
-            };
-
-            var rand = new Random(Environment.TickCount);
-            var chars = new List<char>();
-
-            if (passwordComplexitySetting.RequireUppercase)
-            {
-                chars.Insert(rand.Next(0, chars.Count),
-                    upperCaseLetters[rand.Next(0, upperCaseLetters.Length)]);
-            }
-
-            if (passwordComplexitySetting.RequireLowercase)
-            {
-                chars.Insert(rand.Next(0, chars.Count),
-                    lowerCaseLetters[rand.Next(0, lowerCaseLetters.Length)]);
-            }
-
-            if (passwordComplexitySetting.RequireDigit)
-            {
-                chars.Insert(rand.Next(0, chars.Count),
-                    digits[rand.Next(0, digits.Length)]);
-            }
-
-            if (passwordComplexitySetting.RequireNonAlphanumeric)
-            {
-                chars.Insert(rand.Next(0, chars.Count),
-                    nonAlphanumerics[rand.Next(0, nonAlphanumerics.Length)]);
-            }
-
-            for (var i = chars.Count; i < passwordComplexitySetting.RequiredLength; i++)
-            {
-                var rcs = randomChars[rand.Next(0, randomChars.Length)];
-                chars.Insert(rand.Next(0, chars.Count),
-                    rcs[rand.Next(0, rcs.Length)]);
-            }
-
-            return new string(chars.ToArray());
-        }
 
         protected virtual async Task UpdateUserByInput(IdentityUser user, UserEditDto input, ProfileChangedEvent changedEvent)
         {

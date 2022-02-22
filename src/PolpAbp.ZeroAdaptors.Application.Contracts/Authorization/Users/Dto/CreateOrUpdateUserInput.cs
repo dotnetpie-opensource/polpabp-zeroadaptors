@@ -10,7 +10,6 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Dto
         [Required]
         public UserEditDto User { get; set; }
 
-        [Required]
         public string[] AssignedRoleNames { get; set; }
 
         public bool SendActivationEmail { get; set; }
@@ -22,6 +21,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Dto
         public CreateOrUpdateUserInput()
         {
             OrganizationUnits = new List<Guid>();
+            AssignedRoleNames = new string[0];
         }
     }
 }

@@ -6,6 +6,8 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
 {
     public interface IUserIdentityAssistantAppService : IApplicationService
     {
+        Task<string> CreateRandomPasswordAsync();
+
         /// <summary>
         /// Validates the given password according to the tenant-specific settings.
         /// </summary>

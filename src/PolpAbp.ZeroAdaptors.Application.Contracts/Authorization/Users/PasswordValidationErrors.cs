@@ -2,6 +2,7 @@
 {
     public static class PasswordValidationErrors
     {
+        public const string PasswordRequired = nameof(PasswordRequired);
         public const string InvalidMinLength = nameof(InvalidMinLength);
         public const string UppercaseRequired = nameof(UppercaseRequired);
         public const string LowercaseRequired = nameof(LowercaseRequired);

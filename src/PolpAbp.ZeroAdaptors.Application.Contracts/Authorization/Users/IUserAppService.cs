@@ -8,11 +8,6 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
     public interface IUserAppService : IApplicationService
     {
         /// <summary>
-        /// Creates a random password, based on the tenant settings.
-        /// </summary>
-        /// <returns>Password</returns>
-        string CreateRandomPassword();
-        /// <summary>
         /// Creates a user with the given information.
         /// </summary>
         /// <param name="input">User information</param>

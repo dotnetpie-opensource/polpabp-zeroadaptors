@@ -21,18 +21,21 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Dto
         [Required]
         public string UserName { get; set; }
         [DynamicStringLength(typeof(IdentityUserConsts), "MaxNameLength", null)]
+        [Required]
         public string Name { get; set; }
         [DynamicStringLength(typeof(IdentityUserConsts), "MaxSurnameLength", null)]
+        [Required]
         public string Surname { get; set; }
         /// <summary>
         /// Please use EmailAddress.
         /// Email will be internally assinged to be EmailAddress
         /// </summary>
-        [DynamicStringLength(typeof(IdentityUserConsts), "MaxEmailLength", null)]
-        public string Email { get; set; }
+        public string Email => EmailAddress;
+
         [DynamicStringLength(typeof(IdentityUserConsts), "MaxPhoneNumberLength", null)]
         public string PhoneNumber { get; set; }
-        public bool LockoutEnabled { get; set; }
+        // A redundant on the purpose
+        public bool LockoutEnabled => IsLockoutEnabled;
         public string[] RoleNames { get; set; }
 
         [DisableAuditing]
