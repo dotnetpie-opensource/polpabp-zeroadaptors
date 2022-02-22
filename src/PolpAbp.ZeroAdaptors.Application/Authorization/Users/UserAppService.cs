@@ -304,6 +304,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             await LocalEventBus.PublishAsync(changedEvent);
         }
 
+        [Authorize(IdentityPermissions.Users.Update)]
         public async Task ResetUserPasswordAsync(Guid id, ResetUserPasswordDto input, bool runValidator)
         {
             var user = await IdentityUserManager.GetByIdAsync(id);
