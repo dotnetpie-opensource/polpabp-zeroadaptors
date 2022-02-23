@@ -1,4 +1,5 @@
 ﻿using PolpAbp.Framework.Identity;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.BackgroundJobs;
@@ -26,6 +27,7 @@ namespace PolpAbp.ZeroAdaptors.BackgroundJobs
         public override async Task ExecuteAsync(ResetTenantUserPasswordsArgs args)
         {
             var iterator = new TenantMemberIterator(_currentTenant, _identityUserRepository);
+            var counter = 0;
             await iterator.RunAsync(args.TenantId, async (items) =>
             {
                 // Exclude the external user
@@ -33,12 +35,14 @@ namespace PolpAbp.ZeroAdaptors.BackgroundJobs
 
                 foreach (var candidate in candidates)
                 {
+                    counter++;
+                    var delay = System.Math.Ceiling(counter / 5.0);
                     await _backgroundJobManager.EnqueueAsync(new ResetIndividualUserPasswordArgs
                     {
                         TenantId = args.TenantId,
                         UserId = candidate.Id,
                         Payload = args.Payload 
-                    });
+                    }, delay: TimeSpan.FromSeconds(3 * delay));
                 }
             });
 

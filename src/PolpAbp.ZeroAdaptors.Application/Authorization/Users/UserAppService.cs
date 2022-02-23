@@ -201,7 +201,12 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
            );
 
             (await IdentityUserManager.CreateAsync(user, input.User.Password)).CheckErrors();
-            var changedEvent = new ProfileChangedEvent();
+
+            var changedEvent = new ProfileChangedEvent()
+            {
+                OperatorId = CurrentUser?.Id,
+                SendActivationEmail = input.SendActivationEmail
+            }; 
             await UpdateUserByInput(user, input.User, changedEvent);
 
             foreach (var p in input.User.ExtraProperties)
@@ -227,11 +232,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             // Next seed data for this user, e.g., user role and so on.
             await RegisteredUserDataSeeder.SeedAsync(input.User.EmailAddress, CurrentTenant.Id);
 
-            // Emailing 
-            if (input.SendActivationEmail)
-            {
-                // todo: Send an email
-            }
+            await LocalEventBus.PublishAsync(changedEvent);
 
             // Should change password on next login
             var passwordChangedEvent = new PasswordChangedEvent()
@@ -252,7 +253,8 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
         {
             var changedEvent = new ProfileChangedEvent()
             {
-                OperatorId = CurrentUser?.Id
+                OperatorId = CurrentUser?.Id,
+                SendActivationEmail = input.SendActivationEmail
             };
 
             // Normalize values so that we can leverage the helper 
@@ -317,18 +319,13 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
 
             await CurrentUnitOfWork.SaveChangesAsync();
 
-            // Emailing 
-            if (input.SendActivationEmail)
-            {
-                // todo: Send an email
-            }
+            await LocalEventBus.PublishAsync(changedEvent);
 
             // Events 
             if (passwordChangedEvent != null)
             {
                 await LocalEventBus.PublishAsync(passwordChangedEvent);
             }
-            await LocalEventBus.PublishAsync(changedEvent);
         }
 
         [Authorize(IdentityPermissions.Users.Update)]
