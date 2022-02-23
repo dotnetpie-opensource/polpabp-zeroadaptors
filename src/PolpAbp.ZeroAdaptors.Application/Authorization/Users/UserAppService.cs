@@ -142,6 +142,11 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                 // isactive
                 // ....
             };
+            // Extra properties 
+            foreach (var p in user.ExtraProperties)
+            {
+                output.User.ExtraProperties.Add(p.Key, p.Value);
+            }
 
             var organizationUnits = await IdentityUserManager.GetOrganizationUnitsAsync(user);
             output.MemberedOrganizationUnits = organizationUnits.Select(ou => ou.Code).ToList();
@@ -195,9 +200,23 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                CurrentTenant.Id
            );
 
-            var changedEvent = new ProfileChangedEvent();
             (await IdentityUserManager.CreateAsync(user, input.User.Password)).CheckErrors();
+            var changedEvent = new ProfileChangedEvent();
             await UpdateUserByInput(user, input.User, changedEvent);
+
+            foreach (var p in input.User.ExtraProperties)
+            {
+                if (p.Value == null || string.IsNullOrEmpty(p.Value.ToString()))
+                {
+                    user.RemoveProperty(p.Key);
+                }
+                else
+                {
+                    user.SetProperty(p.Key, p.Value);
+                }
+            }
+
+            (await IdentityUserManager.UpdateAsync(user)).CheckErrors();
 
             await CurrentUnitOfWork.SaveChangesAsync(); // Next make sense to send notifications 
 
@@ -246,6 +265,17 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             await UpdateUserByInput(user, input.User, changedEvent);
             // todo: 
             // input.MapExtraPropertiesTo(user);
+            foreach (var p in input.User.ExtraProperties)
+            {
+                if (p.Value == null || string.IsNullOrEmpty(p.Value.ToString()))
+                {
+                    user.RemoveProperty(p.Key);
+                }
+                else
+                {
+                    user.SetProperty(p.Key, p.Value);
+                }
+            }
 
             (await IdentityUserManager.UpdateAsync(user)).CheckErrors();
 
