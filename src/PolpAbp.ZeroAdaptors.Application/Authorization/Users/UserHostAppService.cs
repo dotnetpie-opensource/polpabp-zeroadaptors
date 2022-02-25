@@ -43,6 +43,12 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                 (await IdentityUserManager.RemovePasswordAsync(user)).CheckErrors();
                 (await IdentityUserManager.AddPasswordAsync(user, input.Password)).CheckErrors();
 
+                if (input.ShouldChangePasswordOnNextLogin)
+                {
+                    user.SetShouldChangePasswordOnNextLogin();
+                    await IdentityUserManager.UpdateAsync(user);
+                }
+
                 var passwordChangedEvent = new PasswordChangedEvent()
                 {
                     UserId = user.Id,

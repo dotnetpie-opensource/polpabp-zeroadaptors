@@ -137,7 +137,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                 PhoneNumber = user.PhoneNumber,
                 IsTwoFactorEnabled = user.TwoFactorEnabled,
                 IsLockoutEnabled = user.LockoutEnabled,
-                ShouldChangePasswordOnNextLogin = user.GetProperty<bool>(nameof(UserEditDto.ShouldChangePasswordOnNextLogin), false)
+                ShouldChangePasswordOnNextLogin = user.ShouldChangePasswordOnNextLogin()
                 // todo:
                 // isactive
                 // ....
@@ -349,10 +349,16 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                 }
             }
 
-                // The following will validate the password.
-                // todo: Validate the password???
-                (await IdentityUserManager.RemovePasswordAsync(user)).CheckErrors();
+            // The following will validate the password.
+            // todo: Validate the password???
+            (await IdentityUserManager.RemovePasswordAsync(user)).CheckErrors();
             (await IdentityUserManager.AddPasswordAsync(user, input.Password)).CheckErrors();
+
+            if (input.ShouldChangePasswordOnNextLogin)
+            {
+                user.SetShouldChangePasswordOnNextLogin();
+                await IdentityUserManager.UpdateAsync(user);
+            }
 
             var passwordChangedEvent = new PasswordChangedEvent()
             {
@@ -446,11 +452,11 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
 
             if (input.ShouldChangePasswordOnNextLogin)
             {
-                user.SetProperty(nameof(UserEditDto.ShouldChangePasswordOnNextLogin), input.ShouldChangePasswordOnNextLogin);
+                user.SetShouldChangePasswordOnNextLogin();
             }
             else
             {
-                user.RemoveProperty(nameof(UserEditDto.ShouldChangePasswordOnNextLogin));
+                user.RemoveShouldChangePasswordOnNextLogin();
             }
         }
     }
