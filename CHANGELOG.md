@@ -1,3 +1,6 @@
+## 3.2.2 (February 25, 2022)
+
+
 ## 3.2.1 (February 25, 2022)
   - Update packages
 
