@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Volo.Abp.Account.Localization;
 using Volo.Abp.Emailing.Templates;
 using Volo.Abp.Localization;
 using Volo.Abp.TextTemplating;
-using PolpAbp.ZeroAdaptors.Localization.Account;
 
 namespace PolpAbp.ZeroAdaptors.Emailing.Account.Templates
 {
@@ -15,9 +12,9 @@ namespace PolpAbp.ZeroAdaptors.Emailing.Account.Templates
             context.Add(
                            new TemplateDefinition(
                                AccountEmailTemplates.EmailActivationtLink,
-                               displayName: LocalizableString.Create<ZeroAdaptorsAccountResource>($"TextTemplate:{AccountEmailTemplates.EmailActivationtLink}"),
+                               displayName: LocalizableString.Create<AccountResource>($"TextTemplate:{AccountEmailTemplates.EmailActivationtLink}"),
                                layout: StandardEmailTemplates.Layout,
-                               localizationResource: typeof(ZeroAdaptorsAccountResource)
+                               localizationResource: typeof(AccountResource)
                            ).WithVirtualFilePath("/Emailing/Account/Templates/EmailActivationLink.tpl", true)
                        );
         }

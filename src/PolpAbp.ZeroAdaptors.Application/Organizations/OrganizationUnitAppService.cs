@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using PolpAbp.Framework.Authorization;
 using PolpAbp.ZeroAdaptors.Organizations.Dto;
 using System;
 using System.Collections.Generic;
@@ -31,11 +32,7 @@ namespace PolpAbp.ZeroAdaptors.Organizations
             _identityUserManager = identityUserManager;
         }
 
-        /// <summary>
-        /// Provides 
-        /// </summary>
-        /// <returns></returns>
-        [Authorize(Authorization.OrganizationUnitPermissions.Default)]
+        [Authorize(OrganizationUnitPermissions.Default)]
         public async Task<ListResultDto<OrganizationUnitDto>> GetOrganizationUnitsAsync()
         {
             var organizationUnits = await _organizationUnitRepository.GetListAsync();
@@ -53,7 +50,7 @@ namespace PolpAbp.ZeroAdaptors.Organizations
             return ret;
         }
 
-        [Authorize(Authorization.OrganizationUnitPermissions.Default)]
+        [Authorize(OrganizationUnitPermissions.Default)]
         public async Task<PagedResultDto<OrganizationUnitUserListDto>> GetOrganizationUnitUsersAsync(GetOrganizationUnitUsersInput input)
         {
             var ou = await _organizationUnitRepository.GetAsync(input.Id);
@@ -71,7 +68,7 @@ namespace PolpAbp.ZeroAdaptors.Organizations
                 }).ToList());
         }
 
-        [Authorize(Authorization.OrganizationUnitPermissions.Default)]
+        [Authorize(OrganizationUnitPermissions.Default)]
         public async Task<PagedResultDto<OrganizationUnitRoleListDto>> GetOrganizationUnitRolesAsync(GetOrganizationUnitRolesInput input)
         {
 
@@ -90,7 +87,7 @@ namespace PolpAbp.ZeroAdaptors.Organizations
                 }).ToList());
         } 
 
-        [Authorize(Authorization.OrganizationUnitPermissions.ManageTree)]
+        [Authorize(OrganizationUnitPermissions.ManageTree)]
         public async Task<OrganizationUnitDto> CreateOrganizationUnitAsync(CreateOrganizationUnitInput input)
         {
             var organizationUnit = new OrganizationUnit(_guidGenerator.Create(),input.DisplayName, input.ParentId, CurrentTenant.Id);
@@ -100,7 +97,7 @@ namespace PolpAbp.ZeroAdaptors.Organizations
             return ObjectMapper.Map<OrganizationUnit, OrganizationUnitDto>(organizationUnit);
         }
 
-        [Authorize(Authorization.OrganizationUnitPermissions.ManageTree)]
+        [Authorize(OrganizationUnitPermissions.ManageTree)]
         public async Task<OrganizationUnitDto> UpdateOrganizationUnitAsync(UpdateOrganizationUnitInput input)
         {
             var organizationUnit = await _organizationUnitRepository.GetAsync(input.Id);
@@ -112,7 +109,7 @@ namespace PolpAbp.ZeroAdaptors.Organizations
             return ObjectMapper.Map<OrganizationUnit, OrganizationUnitDto>(organizationUnit);
         }
 
-        [Authorize(Authorization.OrganizationUnitPermissions.ManageTree)]
+        [Authorize(OrganizationUnitPermissions.ManageTree)]
         public async Task<OrganizationUnitDto> MoveOrganizationUnitAsync(MoveOrganizationUnitInput input)
         {
             await _organizationUnitManager.MoveAsync(input.Id, input.NewParentId);
@@ -120,25 +117,25 @@ namespace PolpAbp.ZeroAdaptors.Organizations
             return ObjectMapper.Map<OrganizationUnit, OrganizationUnitDto>(entity);
         }
 
-        [Authorize(Authorization.OrganizationUnitPermissions.ManageTree)]
+        [Authorize(OrganizationUnitPermissions.ManageTree)]
         public async Task DeleteOrganizationUnitAsync(Guid input)
         {
             await _organizationUnitManager.DeleteAsync(input);
         }
 
-        [Authorize(Authorization.OrganizationUnitPermissions.ManageMembers)]
+        [Authorize(OrganizationUnitPermissions.ManageMembers)]
         public async Task RemoveUserFromOrganizationUnitAsync(UserToOrganizationUnitInput input)
         {
             await _identityUserManager.RemoveFromOrganizationUnitAsync(input.UserId, input.OrganizationUnitId);
         }
 
-        [Authorize(Authorization.OrganizationUnitPermissions.ManageRoles)]
+        [Authorize(OrganizationUnitPermissions.ManageRoles)]
         public async Task RemoveRoleFromOrganizationUnitAsync(RoleToOrganizationUnitInput input)
         {
             await _organizationUnitManager.RemoveRoleFromOrganizationUnitAsync(input.RoleId, input.OrganizationUnitId);
         }
 
-        [Authorize(Authorization.OrganizationUnitPermissions.ManageMembers)]
+        [Authorize(OrganizationUnitPermissions.ManageMembers)]
         public async Task AddUsersToOrganizationUnitAsync(UsersToOrganizationUnitInput input)
         {
             foreach (var userId in input.UserIds)
@@ -147,7 +144,7 @@ namespace PolpAbp.ZeroAdaptors.Organizations
             }
         }
 
-        [Authorize(Authorization.OrganizationUnitPermissions.ManageRoles)]
+        [Authorize(OrganizationUnitPermissions.ManageRoles)]
         public async Task AddRolesToOrganizationUnitAsync(RolesToOrganizationUnitInput input)
         {
             foreach (var roleId in input.RoleIds)
@@ -156,7 +153,7 @@ namespace PolpAbp.ZeroAdaptors.Organizations
             }
         } 
 
-        [Authorize(Authorization.OrganizationUnitPermissions.ManageMembers)]
+        [Authorize(OrganizationUnitPermissions.ManageMembers)]
         public async Task<PagedResultDto<NameValueDto<string>>> FindUsersAsync(FindOrganizationUnitUsersInput input)
         {
             var ou = await _organizationUnitRepository.GetAsync(input.OrganizationUnitId);
@@ -173,7 +170,7 @@ namespace PolpAbp.ZeroAdaptors.Organizations
 
         }
 
-        [Authorize(Authorization.OrganizationUnitPermissions.ManageRoles)]
+        [Authorize(OrganizationUnitPermissions.ManageRoles)]
         public async Task<PagedResultDto<NameValueDto<string>>> FindRolesAsync(FindOrganizationUnitRolesInput input)
         {
             var ou = await _organizationUnitRepository.GetAsync(input.OrganizationUnitId);
