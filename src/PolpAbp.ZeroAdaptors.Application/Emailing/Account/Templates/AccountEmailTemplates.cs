@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PolpAbp.ZeroAdaptors.Emailing.Account.Templates
+﻿namespace PolpAbp.ZeroAdaptors.Emailing.Account.Templates
 {
     public static class AccountEmailTemplates
     {

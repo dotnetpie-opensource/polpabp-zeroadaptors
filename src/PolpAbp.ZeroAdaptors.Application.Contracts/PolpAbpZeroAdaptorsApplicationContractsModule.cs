@@ -1,17 +1,14 @@
-﻿using System;
-using Volo.Abp.Modularity;
-using Volo.Abp.Localization;
-using Volo.Abp.VirtualFileSystem;
-using Volo.Abp.Identity;
-using Volo.Abp.Authorization;
-using Volo.Abp.Domain;
+﻿using PolpAbp.Framework;
+using Volo.Abp.Account.Localization;
 using Volo.Abp.Application;
+using Volo.Abp.Authorization;
 using Volo.Abp.BackgroundJobs;
-using PolpAbp.ZeroAdaptors.Localization.Account;
-using Volo.Abp.Localization.ExceptionHandling;
-using PolpAbp.ZeroAdaptors.Localization.Organizations;
-using PolpAbp.ZeroAdaptors.Localization.MultiTenancy;
-using PolpAbp.Framework;
+using Volo.Abp.Domain;
+using Volo.Abp.Identity;
+using Volo.Abp.Localization;
+using Volo.Abp.Modularity;
+using Volo.Abp.TenantManagement.Localization;
+using Volo.Abp.VirtualFileSystem;
 
 namespace PolpAbp.ZeroAdaptors
 {
@@ -39,26 +36,14 @@ namespace PolpAbp.ZeroAdaptors
             Configure<AbpLocalizationOptions>(options =>
             {
                 options.Resources
-                    .Add<ZeroAdaptorsAccountResource>("en")
+                    .Add<AccountResource>("en")
                     .AddVirtualJson("/Localization/Account/Resources");
 
                 options.Resources
-                .Add<ZeroAdaptorsOrganizationsResource>("en")
-                .AddVirtualJson("/Localization/Organizations/Resources");
-
-                options.Resources
-                .Add<ZeroAdaptorsMultiTenancyResources>("en")
-                .AddVirtualJson("/Localization/MultiTenancy/Resources");
+                    .Add<AbpTenantManagementResource>("en")
+                    .AddVirtualJson("/Localization/MultiTenancy/Resources");
             });
 
-            Configure<AbpExceptionLocalizationOptions>(options =>
-            {
-                options.MapCodeNamespace("PolpApb.ZeroAdaptors", typeof(ZeroAdaptorsAccountResource));
-                // todo: What to do if we have more than 
-                //options.MapCodeNamespace("PolpApb.ZeroAdaptors", typeof(ZeroAdaptorsOrganizationsResource));
-                //options.MapCodeNamespace("PolpApb.ZeroAdaptors", typeof(ZeroAdaptorsMultiTenancyResources));
-
-            });
         }
     }
 }

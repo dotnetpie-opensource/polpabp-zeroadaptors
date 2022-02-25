@@ -1,15 +1,15 @@
-﻿using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Localization;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
+using Volo.Abp.Account.Localization;
+using Volo.Abp.Data;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Emailing;
 using Volo.Abp.Identity;
 using Volo.Abp.MultiTenancy;
+using Volo.Abp.TenantManagement;
 using Volo.Abp.TextTemplating;
 using Volo.Abp.UI.Navigation.Urls;
-using PolpAbp.ZeroAdaptors.Localization.Account;
-using Microsoft.Extensions.Localization;
-using Volo.Abp.Data;
-using System.Text.Encodings.Web;
-using Volo.Abp.TenantManagement;
 
 namespace PolpAbp.ZeroAdaptors.Emailing.Account
 {
@@ -17,7 +17,7 @@ namespace PolpAbp.ZeroAdaptors.Emailing.Account
     {
         private readonly ITemplateRenderer _templateRenderer;
         private readonly IEmailSender _emailSender;
-        protected IStringLocalizer<ZeroAdaptorsAccountResource> StringLocalizer { get; }
+        protected IStringLocalizer<AccountResource> StringLocalizer { get; }
         private readonly IAppUrlProvider _appUrlProvider;
         private readonly ICurrentTenant _currentTenant;
         private readonly IdentityUserManager _userManager;
@@ -27,7 +27,7 @@ namespace PolpAbp.ZeroAdaptors.Emailing.Account
         public ZeroAdaptorsAccountEmailer(
             IEmailSender emailSender,
             ITemplateRenderer templateRenderer,
-            IStringLocalizer<ZeroAdaptorsAccountResource> stringLocalizer,
+            IStringLocalizer<AccountResource> stringLocalizer,
             IAppUrlProvider appUrlProvider,
             ICurrentTenant currentTenant,
             IdentityUserManager userManager,
