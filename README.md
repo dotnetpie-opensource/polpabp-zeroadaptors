@@ -7,19 +7,19 @@ Switch to main branch.
 # Release
 
 1. Switch to release branch
-2. Run
-> git merge main
-3. Run 
-> dnt switch-to-packages
-4. Run (cygwin)
-> bump version
-5. Run (cygwin)
-> gulp
-6. Run (cygwin)
-> make clean
-7. Run (powershell)
-> make build Config=Release 
+2. Merge the main branch
+> git merge main (cygwin)
+3. Update the project references to package references 
+> make update-packages Version=x... (powershell)
+4. Bump the repo version
+> bump version (cygwin)
+5. Update project versions
+> gulp (cygwin)
+6. Clean up the nugets folder
+> make clean (cgywin)
+7. Build
+> make build Config=Release (powershell)
 
 # Deploy
-1. Run 
-> make deploy -f Makefile.deploy NugetSource=xx
+1. Push to the nuget center
+> make deploy -f Makefile.deploy NugetSource=xx (powercell)
