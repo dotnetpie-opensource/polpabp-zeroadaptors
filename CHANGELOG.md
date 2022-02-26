@@ -1,3 +1,6 @@
+## 3.2.5 (February 26, 2022)
+  - Update version
+
 ## 3.2.4 (February 26, 2022)
 
 
