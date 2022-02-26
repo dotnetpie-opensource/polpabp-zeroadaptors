@@ -22,3 +22,5 @@ Switch to main branch.
 
 # Deploy
 1. Push to the nuget center
+
+> make deploy -f .\Makefile.deploy NugetSource=x
