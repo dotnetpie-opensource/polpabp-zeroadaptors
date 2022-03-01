@@ -1,7 +1,5 @@
 ﻿using PolpAbp.ZeroAdaptors.Authorization.Users.Dto;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 
@@ -15,7 +13,8 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
         /// <param name="tenantId">Tenant ID</param>
         /// <param name="userId">User ID</param>
         /// <param name="input">Reset</param>
+        /// <param name="operatorId">Operator Id</param>
         /// <returns>Task</returns>
-        Task ResetUserPasswordAsync(Guid? tenantId, Guid userId, ResetUserPasswordDto input);
+        Task ResetUserPasswordAsync(Guid? tenantId, Guid userId, ResetUserPasswordDto input, Guid? operatorId);
     }
 }

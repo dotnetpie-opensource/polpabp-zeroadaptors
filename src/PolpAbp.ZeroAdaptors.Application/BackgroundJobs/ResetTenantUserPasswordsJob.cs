@@ -41,7 +41,8 @@ namespace PolpAbp.ZeroAdaptors.BackgroundJobs
                     {
                         TenantId = args.TenantId,
                         UserId = candidate.Id,
-                        Payload = args.Payload 
+                        Payload = args.Payload,
+                        OperatorId = args.OperatorId
                     }, delay: TimeSpan.FromSeconds(3 * delay));
                 }
             });
