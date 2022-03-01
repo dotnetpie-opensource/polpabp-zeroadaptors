@@ -17,7 +17,7 @@ namespace PolpAbp.ZeroAdaptors.BackgroundJobs
 
         public async override Task ExecuteAsync(ResetIndividualUserPasswordArgs args)
         {
-            await _userHostAppService.ResetUserPasswordAsync(args.TenantId, args.UserId, args.Payload);
+            await _userHostAppService.ResetUserPasswordAsync(args.TenantId, args.UserId, args.Payload, args.OperatorId);
         }
     }
 }

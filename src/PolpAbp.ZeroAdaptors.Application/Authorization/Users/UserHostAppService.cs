@@ -27,7 +27,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             UserIdentityAssistantAppService = userIdentityAssistantAppService;
         }
 
-        public async Task ResetUserPasswordAsync(Guid? tenantId, Guid userId, ResetUserPasswordDto input)
+        public async Task ResetUserPasswordAsync(Guid? tenantId, Guid userId, ResetUserPasswordDto input, Guid? operatorId)
         {
             using (CurrentTenant.Change(tenantId))
             {
@@ -52,8 +52,8 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                 var passwordChangedEvent = new PasswordChangedEvent()
                 {
                     UserId = user.Id,
-                    OperatorId = CurrentUser?.Id,
-                    TenantId = CurrentUser.TenantId,
+                    OperatorId = operatorId,
+                    TenantId = tenantId,
                     NewPassword = input.Password
                 };
 
