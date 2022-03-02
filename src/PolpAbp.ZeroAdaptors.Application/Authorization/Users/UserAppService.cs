@@ -205,6 +205,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             var changedEvent = new ProfileChangedEvent()
             {
                 OperatorId = CurrentUser?.Id,
+                UserId  = user.Id,
                 SendActivationEmail = input.SendActivationEmail
             }; 
             await UpdateUserByInput(user, input.User, changedEvent);
@@ -251,17 +252,20 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
         [Authorize(IdentityPermissions.Users.Update)]
         public async Task UpdateUserAsync(CreateOrUpdateUserInput input)
         {
-            var changedEvent = new ProfileChangedEvent()
-            {
-                OperatorId = CurrentUser?.Id,
-                SendActivationEmail = input.SendActivationEmail
-            };
 
             // Normalize values so that we can leverage the helper 
             // method to set up roles and other. 
             input.User.RoleNames = input.AssignedRoleNames;
 
             var user = await IdentityUserManager.GetByIdAsync(input.User.Id.Value);
+
+            var changedEvent = new ProfileChangedEvent()
+            {
+                OperatorId = CurrentUser?.Id,
+                SendActivationEmail = input.SendActivationEmail,
+                UserId = user.Id
+            };
+
             // todo: ??
             // user.ConcurrencyStamp = input.ConcurrencyStamp;
             await UpdateUserByInput(user, input.User, changedEvent);
