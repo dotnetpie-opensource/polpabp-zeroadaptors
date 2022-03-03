@@ -204,6 +204,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
 
             var changedEvent = new ProfileChangedEvent()
             {
+                TenantId = CurrentTenant.Id,
                 OperatorId = CurrentUser?.Id,
                 UserId  = user.Id,
                 SendActivationEmail = input.SendActivationEmail
@@ -261,6 +262,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
 
             var changedEvent = new ProfileChangedEvent()
             {
+                TenantId = CurrentTenant.Id,
                 OperatorId = CurrentUser?.Id,
                 SendActivationEmail = input.SendActivationEmail,
                 UserId = user.Id
