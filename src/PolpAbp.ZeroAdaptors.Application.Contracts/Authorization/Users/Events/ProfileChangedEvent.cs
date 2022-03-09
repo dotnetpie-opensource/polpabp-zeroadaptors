@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Volo.Abp.Data;
 
 namespace PolpAbp.ZeroAdaptors.Authorization.Users.Events
 {
-    public class ProfileChangedEvent
+    public class ProfileChangedEvent : IHasExtraProperties
     {
         public Guid? TenantId { get; set; }
         public Guid UserId { get; set; }
@@ -12,9 +13,12 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Events
         public bool IsNew { get; set; }
         public bool SendActivationEmail { get; set; }
 
+        public Dictionary<string, object> ExtraProperties {get;set; }
+
         public ProfileChangedEvent()
         {
             ChangedFields = new List<string>();
+            ExtraProperties = new Dictionary<string, object>();
         }
     }
 }
