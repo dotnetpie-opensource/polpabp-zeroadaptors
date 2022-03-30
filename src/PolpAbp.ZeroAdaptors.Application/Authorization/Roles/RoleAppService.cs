@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using PolpAbp.Framework.Common.Dto;
+using PolpAbp.Framework.Identity;
 using PolpAbp.ZeroAdaptors.Authorization.Permissions.Dto;
 using PolpAbp.ZeroAdaptors.Authorization.Roles.Dto;
 using Volo.Abp;
@@ -31,6 +33,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
         private readonly IPermissionDefinitionManager _permissionDefinitionManager;
         private readonly IPermissionStore _permissionStore;
         private readonly IGuidGenerator _guidGenerator;
+        private readonly IIdentityUserRepositoryExt _identityUserRepositoryExt;
 
         public RoleAppService(
             IIdentityRoleAppService identityRoleAppService,
@@ -38,7 +41,8 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
             IPermissionManager permissionManager,
             IPermissionDefinitionManager permissionDefinitionManager,
             IPermissionStore permissionStore,
-            IGuidGenerator guidGenerator
+            IGuidGenerator guidGenerator,
+            IIdentityUserRepositoryExt identityUserRepositoryExt
             )
         {
             _identityRoleAppService = identityRoleAppService;
@@ -47,6 +51,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
             _permissionDefinitionManager = permissionDefinitionManager;
             _permissionStore = permissionStore;
             _guidGenerator = guidGenerator;
+            _identityUserRepositoryExt = identityUserRepositoryExt;
         }
 
         [Authorize(IdentityPermissions.Roles.Default)]
@@ -185,5 +190,39 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
             return grantedPermissions;
         }
 
+        // todo: Introduce member permission
+        [Authorize(IdentityPermissions.Roles.Default)]
+        public async Task<PagedResultDto<NameValueDto<string>>> GetUsersInRoleAsync(FindRoleMembersInput input, CancellationToken token = default)
+        {
+            var totalCount = await _identityUserRepositoryExt.CountUsersInRoleAsync(input.RoleId, input.Filter, token);
+            var items = await _identityUserRepositoryExt
+                .GetUsersInRolAsync(input.RoleId, input.Sorting,
+                input.MaxResultCount, input.SkipCount, input.Filter, false, token); // todo: includeDetail?
+
+            return new PagedResultDto<NameValueDto<string>>(
+                         totalCount,
+                         items.Select(u => new NameValueDto<string>(
+                                 $"{u.Name} {u.Surname} ({u.NormalizedEmail})",
+                                 u.Id.ToString()
+                             )).ToList());
+        }
+
+
+        // todo: Introduce member permission
+        [Authorize(IdentityPermissions.Roles.Default)]
+        public async Task<PagedResultDto<NameValueDto<string>>> FindUsersAsync(FindRoleMembersInput input, CancellationToken token = default)
+        {
+            var totalCount = await _identityUserRepositoryExt.CountUsersNotInRoleAsync(input.RoleId, input.Filter, token);
+            var items = await _identityUserRepositoryExt
+                .GetUsersNotInRolAsync(input.RoleId, input.Sorting,
+                input.MaxResultCount, input.SkipCount, input.Filter, false, token); // includeDetail
+
+            return new PagedResultDto<NameValueDto<string>>(
+                         totalCount,
+                         items.Select(u => new NameValueDto<string>(
+                                 $"{u.Name} {u.Surname} ({u.NormalizedEmail})",
+                                 u.Id.ToString()
+                             )).ToList());
+        }
     }
 }

@@ -164,7 +164,7 @@ namespace PolpAbp.ZeroAdaptors.Organizations
             return new PagedResultDto<NameValueDto<string>>(
                 totalCount,
                 items.Select(u => new NameValueDto<string>(
-                        u.NormalizedEmail + " (" + u.Email + ")",
+                        $"{u.Name} {u.Surname} ({u.NormalizedEmail})",
                         u.Id.ToString()
                     )).ToList());
 

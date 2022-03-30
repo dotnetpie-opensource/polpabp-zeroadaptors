@@ -1,12 +1,11 @@
 ﻿using PolpAbp.Framework;
-using PolpAbp.ZeroAdaptors.Authorization.Roles;
 using Volo.Abp.Account;
-using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Emailing;
 using Volo.Abp.Identity;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement;
+using Volo.Abp.PermissionManagement.Identity;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TextTemplating;
 using Volo.Abp.UI.Navigation;
@@ -23,6 +22,7 @@ namespace PolpAbp.ZeroAdaptors
         typeof(AbpPermissionManagementDomainModule),
         typeof(AbpTenantManagementDomainModule),
         typeof(AbpIdentityDomainModule),
+        typeof(AbpPermissionManagementDomainIdentityModule),
         typeof(AbpAccountApplicationContractsModule),
         typeof(AbpTextTemplatingModule),
         typeof(AbpEmailingModule),
@@ -47,13 +47,6 @@ namespace PolpAbp.ZeroAdaptors
                 options.Applications["MVC"].Urls[ZeroAdaptorsUrlNames.EmailActivation] = "Account/EmailActivation";
             });
 
-            Configure<PermissionManagementOptions>(options =>
-            {
-                options.ProviderPolicies[UserPermissionValueProvider.ProviderName] = UserPermissionValueProvider.ProviderName;
-                options.ProviderPolicies[RolePermissionValueProvider.ProviderName] = RolePermissionValueProvider.ProviderName;
-                options.ManagementProviders.Add<RolePermissionManagementProvider>();
-
-            });
         }
     }
 }

@@ -4,6 +4,8 @@ using PolpAbp.ZeroAdaptors.Authorization.Roles.Dto;
 using Volo.Abp.Application.Dtos;
 using PolpAbp.Framework.Common.Dto;
 using System;
+using Microsoft.AspNetCore.Authorization;
+using System.Threading;
 
 namespace PolpAbp.ZeroAdaptors.Authorization.Roles
 {
@@ -17,6 +19,8 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
         Task<GetRoleForEditOutput> GetRoleForEdit(NullableIdDto<Guid> input);
 
         Task CreateOrUpdateRole(CreateOrUpdateRoleInput input);
+        Task<PagedResultDto<NameValueDto<string>>> GetUsersInRoleAsync(FindRoleMembersInput input, CancellationToken token = default);
+        Task<PagedResultDto<NameValueDto<string>>> FindUsersAsync(FindRoleMembersInput input, CancellationToken token = default);
 
         // Task DeleteRole(EntityDto input);
     }
