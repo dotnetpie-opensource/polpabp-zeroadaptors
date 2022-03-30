@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using PolpAbp.ZeroAdaptors.Authorization.Permissions.Dto;
+using PolpAbp.ZeroAdaptors.Authorization.Roles.Dto;
 using PolpAbp.ZeroAdaptors.Organizations.Dto;
 using PolpAbp.ZeroAdaptors.Sessions.Dto;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.Identity;
 using Volo.Abp.TenantManagement;
 
@@ -36,7 +39,15 @@ namespace PolpAbp.ZeroAdaptors
 
             CreateMap<IdentityRole, OrganizationUnitRoleListDto>()
                 .ForMember(dto => dto.DisplayName, options => options.MapFrom(src => src.NormalizedName))
-                .ForMember(dto => dto.AddedTime, options => options.Ignore()); // We have no way to get added time yet.
+                .ForMember(dto => dto.AddedTime, options => options.Ignore()); // todo: New added time
+
+            CreateMap<IdentityRoleDto, RoleListDto>()
+                .ForMember(t => t.DisplayName, o => o.MapFrom(s => s.Name))
+                .ForMember(t => t.CreationTime, o => o.Ignore()); // todo: No creation time
+
+            CreateMap<IdentityRole, RoleEditDto>()
+                .ForMember(t => t.DisplayName, o => o.MapFrom(s => s.NormalizedName));
+
         }
     }
 }
