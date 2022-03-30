@@ -34,6 +34,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
         private readonly IPermissionStore _permissionStore;
         private readonly IGuidGenerator _guidGenerator;
         private readonly IIdentityUserRepositoryExt _identityUserRepositoryExt;
+        private readonly IdentityUserManager _userManager;
 
         public RoleAppService(
             IIdentityRoleAppService identityRoleAppService,
@@ -42,7 +43,8 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
             IPermissionDefinitionManager permissionDefinitionManager,
             IPermissionStore permissionStore,
             IGuidGenerator guidGenerator,
-            IIdentityUserRepositoryExt identityUserRepositoryExt
+            IIdentityUserRepositoryExt identityUserRepositoryExt,
+            IdentityUserManager userManager
             )
         {
             _identityRoleAppService = identityRoleAppService;
@@ -52,6 +54,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
             _permissionStore = permissionStore;
             _guidGenerator = guidGenerator;
             _identityUserRepositoryExt = identityUserRepositoryExt;
+            _userManager = userManager;
         }
 
         [Authorize(IdentityPermissions.Roles.Default)]
@@ -223,6 +226,36 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
                                  $"{u.Name} {u.Surname} ({u.NormalizedEmail})",
                                  u.Id.ToString()
                              )).ToList());
+        }
+
+        [Authorize(IdentityPermissions.Roles.Update)]
+        public async Task AddUsersToRoleAsync(UsersToRoleInput input)
+        {
+            var role = await _identityRoleManager.GetByIdAsync(input.RoleId);
+            foreach(var u in input.UserIds)
+            {
+                var user = await _userManager.GetByIdAsync(u);
+                var isMember = await _userManager.IsInRoleAsync(user, role.NormalizedName);
+                if (!isMember)
+                {
+                    (await _userManager.AddToRoleAsync(user, role.NormalizedName)).CheckErrors();
+                }
+            }
+        }
+
+        [Authorize(IdentityPermissions.Roles.Update)]
+        public async Task RemoveUsersFromRoleAsync(UsersToRoleInput input)
+        {
+            var role = await _identityRoleManager.GetByIdAsync(input.RoleId);
+            foreach (var u in input.UserIds)
+            {
+                var user = await _userManager.GetByIdAsync(u);
+                var isMember = await _userManager.IsInRoleAsync(user, role.NormalizedName);
+                if (isMember)
+                {
+                    (await _userManager.RemoveFromRoleAsync(user, role.NormalizedName)).CheckErrors();
+                }
+            }
         }
     }
 }
