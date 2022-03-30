@@ -1,5 +1,7 @@
 ﻿using PolpAbp.Framework;
+using PolpAbp.ZeroAdaptors.Authorization.Roles;
 using Volo.Abp.Account;
+using Volo.Abp.Authorization.Permissions;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Emailing;
 using Volo.Abp.Identity;
@@ -43,6 +45,14 @@ namespace PolpAbp.ZeroAdaptors
             Configure<AppUrlOptions>(options =>
             {
                 options.Applications["MVC"].Urls[ZeroAdaptorsUrlNames.EmailActivation] = "Account/EmailActivation";
+            });
+
+            Configure<PermissionManagementOptions>(options =>
+            {
+                options.ProviderPolicies[UserPermissionValueProvider.ProviderName] = UserPermissionValueProvider.ProviderName;
+                options.ProviderPolicies[RolePermissionValueProvider.ProviderName] = RolePermissionValueProvider.ProviderName;
+                options.ManagementProviders.Add<RolePermissionManagementProvider>();
+
             });
         }
     }
