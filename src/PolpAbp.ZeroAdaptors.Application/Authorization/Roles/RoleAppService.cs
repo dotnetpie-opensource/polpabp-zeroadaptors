@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using PolpAbp.Framework.Common.Dto;
 using PolpAbp.ZeroAdaptors.Authorization.Permissions.Dto;
@@ -27,7 +28,6 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
         private readonly IIdentityRoleAppService _identityRoleAppService;
         private readonly IPermissionManager _permissionManager;
         private readonly IdentityRoleManager _identityRoleManager;
-        private readonly IPermissionAppService _permissionAppService;
         private readonly IPermissionDefinitionManager _permissionDefinitionManager;
         private readonly IPermissionStore _permissionStore;
         private readonly IGuidGenerator _guidGenerator;
@@ -36,7 +36,6 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
             IIdentityRoleAppService identityRoleAppService,
             IdentityRoleManager identityRoleManager,
             IPermissionManager permissionManager,
-            IPermissionAppService permissionAppService,
             IPermissionDefinitionManager permissionDefinitionManager,
             IPermissionStore permissionStore,
             IGuidGenerator guidGenerator
@@ -45,12 +44,12 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
             _identityRoleAppService = identityRoleAppService;
             _identityRoleManager = identityRoleManager;
             _permissionManager = permissionManager;
-            _permissionAppService = permissionAppService;
             _permissionDefinitionManager = permissionDefinitionManager;
             _permissionStore = permissionStore;
             _guidGenerator = guidGenerator;
         }
 
+        [Authorize(IdentityPermissions.Roles.Default)]
         public async Task<ListResultDto<RoleListDto>> GetRoles(GetRolesInput input)
         {
             var output = await _identityRoleAppService.GetAllListAsync();
@@ -66,7 +65,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
             return new ListResultDto<RoleListDto>(items);
         }
 
-
+        [Authorize(IdentityPermissions.Roles.Default)]
         public async Task<GetRoleForEditOutput> GetRoleForEdit(NullableIdDto<Guid> input)
         {
             // We exclude those permission for machine clients as well.
@@ -102,6 +101,11 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
             };
         }
 
+        // Currently we do not support just a create or update.
+        [Authorize(IdentityPermissions.Roles.Create)]
+        [Authorize(IdentityPermissions.Roles.Update)]
+        [Authorize(IdentityPermissions.Roles.ManagePermissions)]
+
         public async Task CreateOrUpdateRole(CreateOrUpdateRoleInput input)
         {
             if (input.Role.Id.HasValue)
@@ -131,29 +135,15 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
             var toBeRemoved = currPerms.Where(x => !input.GrantedPermissionNames.Contains(x));
             var toBeAdded = input.GrantedPermissionNames.Where(x => !currPerms.Contains(x));
 
-            var updatedPermissions = new List<UpdatePermissionDto>();
             foreach(var r in toBeRemoved)
             {
-                updatedPermissions.Add(new UpdatePermissionDto
-                {
-                    IsGranted = false,
-                    Name = r
-                });
+                await _permissionManager.SetAsync(r, RolePermissionValueProvider.ProviderName, role.Id.ToString(), false);
             }
 
             foreach(var a in toBeAdded)
             {
-                updatedPermissions.Add(new UpdatePermissionDto
-                {
-                    IsGranted = true,
-                    Name = a
-                });
+                await _permissionManager.SetAsync(a, RolePermissionValueProvider.ProviderName, role.Id.ToString(), true);
             }
-
-            await _permissionAppService.UpdateAsync("R", input.Role.Id.Value.ToString(), new UpdatePermissionsDto
-            {
-                Permissions = updatedPermissions.ToArray()
-            });
         }
 
         protected virtual async Task CreateRoleAsync(CreateOrUpdateRoleInput input)
@@ -164,21 +154,11 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
             (await _identityRoleManager.CreateAsync(role)).CheckErrors();
             await CurrentUnitOfWork.SaveChangesAsync(); //It's done to get Id of the role.
 
-            var updatedPermissions = new List<UpdatePermissionDto>();
-
             foreach (var a in input.GrantedPermissionNames)
             {
-                updatedPermissions.Add(new UpdatePermissionDto
-                {
-                    IsGranted = true,
-                    Name = a
-                });
+                await _permissionManager.SetAsync(a, RolePermissionValueProvider.ProviderName, role.Id.ToString(), true);
             }
 
-            await _permissionAppService.UpdateAsync("R", input.Role.Id.Value.ToString(), new UpdatePermissionsDto
-            {
-                Permissions = updatedPermissions.ToArray()
-            });
         }
 
         protected async Task ComputeGrantedPermissionsForRoleAsync(Guid roleId, List<string> grantedPermissions) {

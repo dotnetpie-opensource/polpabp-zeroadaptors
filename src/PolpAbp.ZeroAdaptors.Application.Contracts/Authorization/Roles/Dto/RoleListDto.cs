@@ -6,6 +6,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles.Dto
 {
     public class RoleListDto : EntityDto, IHasCreationTime
     {
+        public Guid Id { get; set; }
         public string Name { get; set; }
 
         public string DisplayName { get; set; }
