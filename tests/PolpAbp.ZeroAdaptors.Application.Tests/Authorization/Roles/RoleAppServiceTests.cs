@@ -130,5 +130,39 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
             Assert.True(newInfo.GrantedPermissionNames.Count == 0);
         }
 
+        [Fact]
+        public async Task CanGetUsersInRoleAsync()
+        {
+            var roles = await _roleAppService.GetRoles(new Dto.GetRolesInput());
+            var role = roles.Items.FirstOrDefault(x => string.Equals(x.Name, "admin", StringComparison.OrdinalIgnoreCase));
+
+            var users = await _roleAppService.GetUsersInRoleAsync(new Dto.FindRoleMembersInput
+            {
+                RoleId = role.Id,
+                MaxResultCount = 100,
+                SkipCount = 0
+            });
+
+            Assert.NotNull(users);
+            Assert.True(users.TotalCount > 0);
+        }
+
+
+        [Fact]
+        public async Task CanFindUsers()
+        {
+            var roles = await _roleAppService.GetRoles(new Dto.GetRolesInput());
+            var role = roles.Items.FirstOrDefault(x => string.Equals(x.Name, "admin", StringComparison.OrdinalIgnoreCase));
+
+            var users = await _roleAppService.FindUsersAsync(new Dto.FindRoleMembersInput
+            {
+                RoleId = role.Id,
+                MaxResultCount = 100,
+                SkipCount = 0
+            });
+
+            Assert.NotNull(users);
+            Assert.True(users.TotalCount > 0);
+        }
     }
 }
