@@ -25,6 +25,8 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
         Task RemoveUsersFromRoleAsync(UsersToRoleInput input);
         [Authorize("AbpIdentity.Roles.Update")]
         Task AddUsersToRoleAsync(UsersToRoleInput input);
+        [Authorize("AbpIdentity.Roles.Delete")]
+        Task DeleteRoleAsync(Guid id);
 
         // Task DeleteRole(EntityDto input);
     }

@@ -199,7 +199,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
         {
             var totalCount = await _identityUserRepositoryExt.CountUsersInRoleAsync(input.RoleId, input.Filter, token);
             var items = await _identityUserRepositoryExt
-                .GetUsersInRolAsync(input.RoleId, input.Sorting,
+                .GetUsersInRoleAsync(input.RoleId, input.Sorting,
                 input.MaxResultCount, input.SkipCount, input.Filter, false, token); // todo: includeDetail?
 
             return new PagedResultDto<NameValueDto<string>>(
@@ -217,7 +217,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
         {
             var totalCount = await _identityUserRepositoryExt.CountUsersNotInRoleAsync(input.RoleId, input.Filter, token);
             var items = await _identityUserRepositoryExt
-                .GetUsersNotInRolAsync(input.RoleId, input.Sorting,
+                .GetUsersNotInRoleAsync(input.RoleId, input.Sorting,
                 input.MaxResultCount, input.SkipCount, input.Filter, false, token); // includeDetail
 
             return new PagedResultDto<NameValueDto<string>>(
@@ -256,6 +256,30 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
                     (await _userManager.RemoveFromRoleAsync(user, role.NormalizedName)).CheckErrors();
                 }
             }
+        }
+
+        [Authorize(IdentityPermissions.Roles.Delete)]
+        public async Task DeleteRoleAsync(Guid id)
+        {
+            var role = await _identityRoleManager.GetByIdAsync(id);
+
+            var totalCount  = await _identityUserRepositoryExt.CountUsersInRoleAsync(role.Id);
+            var skipCount = 0;
+            while (skipCount < totalCount)
+            {
+                // Delete all users first 
+                var items = await _identityUserRepositoryExt
+                    .GetUsersInRoleAsync(role.Id, skipCount: skipCount, maxResultCount: 100);
+                skipCount = skipCount + items.Count;
+
+                foreach (var item in items)
+                {
+                    var user = await _userManager.GetByIdAsync(item.Id);
+                    (await _userManager.RemoveFromRoleAsync(user, role.NormalizedName)).CheckErrors();
+                }
+            }
+
+            await _identityRoleManager.DeleteAsync(role);
         }
     }
 }

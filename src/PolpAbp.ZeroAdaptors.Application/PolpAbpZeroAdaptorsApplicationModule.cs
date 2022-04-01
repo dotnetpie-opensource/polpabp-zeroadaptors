@@ -15,6 +15,7 @@ using Volo.Abp.VirtualFileSystem;
 namespace PolpAbp.ZeroAdaptors
 {
     [DependsOn(
+        typeof(PolpAbpFrameworkApplicationContractsModule),
         typeof(PolpAbpFrameworkApplicationModule),
         typeof(PolpAbpZeroAdaptorsDomainModule),
         typeof(PolpAbpZeroAdaptorsCoreSharedModule),
@@ -35,11 +36,6 @@ namespace PolpAbp.ZeroAdaptors
             Configure<AbpAutoMapperOptions>(options =>
             {
                 options.AddMaps<PolpAbpZeroAdaptorsApplicationModule>();
-            });
-
-            Configure<AbpVirtualFileSystemOptions>(options =>
-            {
-                options.FileSets.AddEmbedded<PolpAbpZeroAdaptorsApplicationModule>("PolpApb.ZeroAdaptors");
             });
 
             Configure<AppUrlOptions>(options =>
