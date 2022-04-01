@@ -51,7 +51,11 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Permissions
                     permDefs = permDefs.Where(x => x.MultiTenancySide.HasFlag(MultiTenancySides.Tenant));
                 }
 
-                return permDefs.ToList();
+                // Sort permissions
+
+                var sorted = permDefs.ToList();
+
+                return sorted;
             });
         }
 

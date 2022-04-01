@@ -31,11 +31,13 @@ namespace PolpAbp.ZeroAdaptors
             //OrganizationUnit
             CreateMap<OrganizationUnit, OrganizationUnitDto>()
                 .ForMember(dto => dto.MemberCount, options => options.Ignore())
-                .ForMember(dto => dto.RoleCount, options => options.Ignore());
+                .ForMember(dto => dto.RoleCount, options => options.Ignore())
+                .ForMember(dto => dto.ExtraProperties, options => options.Ignore());
 
             CreateMap<IdentityUser, OrganizationUnitUserListDto>()
                 .ForMember(dto => dto.AddedTime, options => options.Ignore()) // We have no way to get added time yet. todo:
-                .ForMember(dto => dto.ProfilePictureId, options => options.Ignore());
+                .ForMember(dto => dto.ProfilePictureId, options => options.Ignore())
+                .ForMember(dto => dto.ExtraProperties, options => options.Ignore());
 
             CreateMap<IdentityRole, OrganizationUnitRoleListDto>()
                 .ForMember(dto => dto.DisplayName, options => options.MapFrom(src => src.NormalizedName))

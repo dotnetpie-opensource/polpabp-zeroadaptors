@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Data;
 
 namespace PolpAbp.ZeroAdaptors.Organizations.Dto
 {
-    public class OrganizationUnitDto : AuditedEntityDto<Guid>
+    public class OrganizationUnitDto : AuditedEntityDto<Guid>, IHasExtraProperties
     {
         public Guid? ParentId { get; set; }
 
@@ -14,5 +16,12 @@ namespace PolpAbp.ZeroAdaptors.Organizations.Dto
         public int MemberCount { get; set; }
         
         public int RoleCount { get; set; }
+
+        public Dictionary<string, object> ExtraProperties { get; set; }
+
+        public OrganizationUnitDto()
+        {
+            ExtraProperties = new Dictionary<string, object>();
+        }
     }
 }
