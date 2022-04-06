@@ -11,5 +11,9 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles.Dto
         public string DisplayName { get; set; }
         
         public bool IsDefault { get; set; }
+
+        public bool IsStatic { get; set; }
+
+        public bool IsPublic { get; set; }  
     }
 }
