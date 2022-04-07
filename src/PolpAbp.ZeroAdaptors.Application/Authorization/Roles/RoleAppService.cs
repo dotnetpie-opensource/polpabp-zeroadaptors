@@ -91,7 +91,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
                 var role = await _identityRoleManager.GetByIdAsync(input.Id.Value);
                 ObjectMapper.Map<IdentityRole, RoleEditDto>(role, roleEditDto);
 
-                await ComputeGrantedPermissionsForRoleAsync(role.Id, grantedPermissions);
+                await ComputeGrantedPermissionsForRoleAsync(role, grantedPermissions);
             }
 
             var permissions = permDefs.Select(x => new FlatPermissionDto
@@ -99,7 +99,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
                 Name = x.Name,
                 ParentName = x.Parent?.Name,
                 DisplayName = x.DisplayName.Localize(StringLocalizerFactory)
-            }).OrderBy(y => y.DisplayName).ToList();
+            }).ToList();
 
             return new GetRoleForEditOutput
             {
@@ -131,6 +131,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
             Debug.Assert(input.Role.Id != null, "input.Role.Id should be set.");
 
             var role = await _identityRoleManager.GetByIdAsync(input.Role.Id.Value);
+
             // todo: Change name
             // todo: We use Display name as name
             // role.ChangeName(input.Role.DisplayName);
@@ -139,18 +140,17 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
             role.IsDefault = input.Role.IsDefault;
             await _identityRoleManager.UpdateAsync(role);
 
-            var currPerms = await ComputeGrantedPermissionsForRoleAsync(input.Role.Id.Value);
+            var currPerms = await ComputeGrantedPermissionsForRoleAsync(role);
             var toBeRemoved = currPerms.Where(x => !input.GrantedPermissionNames.Contains(x));
             var toBeAdded = input.GrantedPermissionNames.Where(x => !currPerms.Contains(x));
-
             foreach(var r in toBeRemoved)
             {
-                await _permissionManager.SetAsync(r, RolePermissionValueProvider.ProviderName, role.Id.ToString(), false);
+                await _permissionManager.SetAsync(r, RolePermissionValueProvider.ProviderName, role.NormalizedName, false);
             }
 
             foreach(var a in toBeAdded)
             {
-                await _permissionManager.SetAsync(a, RolePermissionValueProvider.ProviderName, role.Id.ToString(), true);
+                await _permissionManager.SetAsync(a, RolePermissionValueProvider.ProviderName, role.NormalizedName, true);
             }
         }
 
@@ -164,12 +164,12 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
 
             foreach (var a in input.GrantedPermissionNames)
             {
-                await _permissionManager.SetAsync(a, RolePermissionValueProvider.ProviderName, role.Id.ToString(), true);
+                await _permissionManager.SetAsync(a, RolePermissionValueProvider.ProviderName, role.NormalizedName, true);
             }
 
         }
 
-        protected async Task ComputeGrantedPermissionsForRoleAsync(Guid roleId, List<string> grantedPermissions) {
+        protected async Task ComputeGrantedPermissionsForRoleAsync(IdentityRole role, List<string> grantedPermissions) {
             // We exclude those permission for machine clients as well.
             var permDefs = _permissionDefinitionManager.GetPermissions()
                       .Where(x => x.IsEnabled &&
@@ -178,7 +178,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
 
             foreach (var p in permDefs)
             {
-                var isGranted = await _permissionStore.IsGrantedAsync(p.Name, "R", roleId.ToString());
+                var isGranted = await _permissionStore.IsGrantedAsync(p.Name, "R", role.NormalizedName);
                 if (isGranted)
                 {
                     grantedPermissions.Add(p.Name);
@@ -186,10 +186,10 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
             }
         }
 
-        protected async Task<List<string>> ComputeGrantedPermissionsForRoleAsync(Guid roleId)
+        protected async Task<List<string>> ComputeGrantedPermissionsForRoleAsync(IdentityRole role)
         {
             var grantedPermissions = new List<string>();
-            await ComputeGrantedPermissionsForRoleAsync(roleId, grantedPermissions);
+            await ComputeGrantedPermissionsForRoleAsync(role, grantedPermissions);
             return grantedPermissions;
         }
 
