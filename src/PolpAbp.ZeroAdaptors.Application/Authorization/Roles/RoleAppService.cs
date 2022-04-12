@@ -114,19 +114,19 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
         [Authorize(IdentityPermissions.Roles.Update)]
         [Authorize(IdentityPermissions.Roles.ManagePermissions)]
 
-        public async Task CreateOrUpdateRole(CreateOrUpdateRoleInput input)
+        public async Task<Guid> CreateOrUpdateRole(CreateOrUpdateRoleInput input)
         {
             if (input.Role.Id.HasValue)
             {
-                await UpdateRoleAsync(input);
+                return await UpdateRoleAsync(input);
             }
             else
             {
-                await CreateRoleAsync(input);
+                return await CreateRoleAsync(input);
             }
         }
 
-        protected virtual async Task UpdateRoleAsync(CreateOrUpdateRoleInput input)
+        protected virtual async Task<Guid> UpdateRoleAsync(CreateOrUpdateRoleInput input)
         {
             Debug.Assert(input.Role.Id != null, "input.Role.Id should be set.");
 
@@ -152,9 +152,11 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
             {
                 await _permissionManager.SetAsync(a, RolePermissionValueProvider.ProviderName, role.NormalizedName, true);
             }
+
+            return role.Id;
         }
 
-        protected virtual async Task CreateRoleAsync(CreateOrUpdateRoleInput input)
+        protected virtual async Task<Guid> CreateRoleAsync(CreateOrUpdateRoleInput input)
         {
             var role = new IdentityRole(_guidGenerator.Create(), input.Role.DisplayName, CurrentTenant.Id);
             role.IsDefault = input.Role.IsDefault;
@@ -167,6 +169,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
                 await _permissionManager.SetAsync(a, RolePermissionValueProvider.ProviderName, role.NormalizedName, true);
             }
 
+            return role.Id;
         }
 
         protected async Task ComputeGrantedPermissionsForRoleAsync(IdentityRole role, List<string> grantedPermissions) {

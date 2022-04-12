@@ -18,14 +18,11 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Roles
 
         Task<GetRoleForEditOutput> GetRoleForEdit(NullableIdDto<Guid> input);
 
-        Task CreateOrUpdateRole(CreateOrUpdateRoleInput input);
+        Task<Guid> CreateOrUpdateRole(CreateOrUpdateRoleInput input);
         Task<PagedResultDto<NameValueDto<string>>> GetUsersInRoleAsync(FindRoleMembersInput input, CancellationToken token = default);
         Task<PagedResultDto<NameValueDto<string>>> FindUsersAsync(FindRoleMembersInput input, CancellationToken token = default);
-        [Authorize("AbpIdentity.Roles.Update")]
         Task RemoveUsersFromRoleAsync(UsersToRoleInput input);
-        [Authorize("AbpIdentity.Roles.Update")]
         Task AddUsersToRoleAsync(UsersToRoleInput input);
-        [Authorize("AbpIdentity.Roles.Delete")]
         Task DeleteRoleAsync(Guid id);
 
         // Task DeleteRole(EntityDto input);
