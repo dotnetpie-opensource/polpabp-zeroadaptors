@@ -10,7 +10,7 @@
 
   <ItemGroup>
 	  <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
-	  <PackageReference Include="PolpAbp.Framework.Domain.Tests" Version="3.3.3" />
+	  <PackageReference Include="PolpAbp.Framework.Domain.Tests" Version="3.3.4" />
   </ItemGroup>
 
   <ItemGroup>
