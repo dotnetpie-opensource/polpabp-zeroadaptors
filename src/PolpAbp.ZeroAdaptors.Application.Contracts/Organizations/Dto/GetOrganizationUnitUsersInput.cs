@@ -10,6 +10,8 @@ namespace PolpAbp.ZeroAdaptors.Organizations.Dto
         // [Range(1, long.MaxValue)]
         public Guid Id { get; set; }
 
+        public string Filter { get; set; }
+
         public void Normalize()
         {
             if (string.IsNullOrEmpty(Sorting))

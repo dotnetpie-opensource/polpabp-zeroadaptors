@@ -9,6 +9,7 @@ using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Guids;
 using Volo.Abp.Identity;
+using PolpAbp.Framework.Identity;
 
 namespace PolpAbp.ZeroAdaptors.Organizations
 {
@@ -19,17 +20,21 @@ namespace PolpAbp.ZeroAdaptors.Organizations
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
         private readonly IdentityUserManager _identityUserManager;
         private readonly IGuidGenerator _guidGenerator;
+        private readonly IIdentityUserRepositoryExt _identityUserRepositoryExt;
 
         public OrganizationUnitAppService(
             OrganizationUnitManager organizationUnitManager,
             IOrganizationUnitRepository organizationUnitRepository,
             IdentityUserManager identityUserManager,
-            IGuidGenerator guidGenerator)
+            IGuidGenerator guidGenerator,
+            IIdentityUserRepositoryExt identityUserRepositoryExt
+            )
         {
             _organizationUnitManager = organizationUnitManager;
             _organizationUnitRepository = organizationUnitRepository;
             _guidGenerator = guidGenerator;
             _identityUserManager = identityUserManager;
+            _identityUserRepositoryExt = identityUserRepositoryExt;
         }
 
         [Authorize(OrganizationUnitPermissions.Default)]
@@ -53,10 +58,9 @@ namespace PolpAbp.ZeroAdaptors.Organizations
         [Authorize(OrganizationUnitPermissions.Default)]
         public async Task<PagedResultDto<OrganizationUnitUserListDto>> GetOrganizationUnitUsersAsync(GetOrganizationUnitUsersInput input)
         {
-            var ou = await _organizationUnitRepository.GetAsync(input.Id);
-            var totalCount = await _organizationUnitRepository.GetMembersCountAsync(ou);
-            var items = await _organizationUnitRepository
-                .GetMembersAsync(ou, sorting: input.Sorting, maxResultCount: input.MaxResultCount, skipCount: input.SkipCount, filter: null);
+            var totalCount = await _identityUserRepositoryExt.CountUsersInOrganizationUnitAsync(input.Id, filter: input.Filter);
+            var items = await _identityUserRepositoryExt
+                .GetUsersInOrganizationUnitAsync(input.Id, sorting: input.Sorting, maxResultCount: input.MaxResultCount, skipCount: input.SkipCount, filter: input.Filter);
 
             return new PagedResultDto<OrganizationUnitUserListDto>(
                 totalCount,
@@ -156,10 +160,9 @@ namespace PolpAbp.ZeroAdaptors.Organizations
         [Authorize(OrganizationUnitPermissions.ManageMembers)]
         public async Task<PagedResultDto<NameValueDto<string>>> FindUsersAsync(FindOrganizationUnitUsersInput input)
         {
-            var ou = await _organizationUnitRepository.GetAsync(input.OrganizationUnitId);
-            var totalCount = await _organizationUnitRepository.GetUnaddedUsersCountAsync(ou, filter: input.Filter);
-            var items = await _organizationUnitRepository
-                .GetUnaddedUsersAsync(ou, sorting: input.Sorting, maxResultCount: input.MaxResultCount, skipCount: input.SkipCount, filter: input.Filter);
+            var totalCount = await _identityUserRepositoryExt.CountUsersNotInOrganizationUnitAsync(input.OrganizationUnitId, input.Filter);
+            var items = await _identityUserRepositoryExt
+                .GetUsersNotInOrganizationUnitAsync(input.OrganizationUnitId, sorting: input.Sorting, maxResultCount: input.MaxResultCount, skipCount: input.SkipCount, filter: input.Filter);
 
             return new PagedResultDto<NameValueDto<string>>(
                 totalCount,
