@@ -2,12 +2,13 @@
 using PolpAbp.ZeroAdaptors.Authorization.Users.Dto;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Events;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
+using Volo.Abp.Data;
 using Volo.Abp.EventBus.Local;
 using Volo.Abp.Identity;
+using Volo.Abp.MultiTenancy;
+using IdentityUser = Volo.Abp.Identity.IdentityUser;
 
 namespace PolpAbp.ZeroAdaptors.Authorization.Users
 {
@@ -17,14 +18,26 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
         protected readonly IdentityUserManager IdentityUserManager;
         protected readonly ILocalEventBus LocalEventBus;
         protected readonly IUserIdentityAssistantAppService UserIdentityAssistantAppService;
+        protected readonly IDataFilter DataFilter;
 
         public UserHostAppService(IdentityUserManager identityUserManager,
             ILocalEventBus localEventBus,
-            IUserIdentityAssistantAppService userIdentityAssistantAppService)
+            IUserIdentityAssistantAppService userIdentityAssistantAppService,
+            IDataFilter dataFilter)
         {
             IdentityUserManager = identityUserManager;
             LocalEventBus = localEventBus;
             UserIdentityAssistantAppService = userIdentityAssistantAppService;
+            DataFilter = dataFilter;
+        }
+
+        public async Task<IdentityUser> GetUserAcrossSystem(string email)
+        {
+            using (DataFilter.Disable<IMultiTenant>())
+            {
+                var user = await IdentityUserManager.FindByEmailAsync(email);
+                return user;
+            }
         }
 
         public async Task ResetUserPasswordAsync(Guid? tenantId, Guid userId, ResetUserPasswordDto input, Guid? operatorId)

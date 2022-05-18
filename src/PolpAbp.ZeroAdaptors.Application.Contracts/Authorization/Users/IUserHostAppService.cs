@@ -2,11 +2,14 @@
 using System;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Identity;
 
 namespace PolpAbp.ZeroAdaptors.Authorization.Users
 {
     public interface IUserHostAppService : IApplicationService
     {
+        Task<IdentityUser> GetUserAcrossSystem(string email);
+
         /// <summary>
         /// Resets the password for the given user.
         /// </summary>
