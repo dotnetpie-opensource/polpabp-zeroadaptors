@@ -54,7 +54,6 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             UserIdentityAssistantAppService = userIdentityAssistantAppService;
         }
 
-        [Authorize(IdentityPermissions.Users.Create)]
         public async Task<GetUserForEditOutput> GetUserForCreateAsync()
         {
             var roles = await IdentityRoleRepository.GetListAsync();
@@ -99,7 +98,6 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             return output;
         }
 
-        [Authorize(IdentityPermissions.Users.Update)]
         public async Task<GetUserForEditOutput> GetUserForEditAsync(Guid input)
         {
             var roles = await IdentityRoleRepository.GetListAsync();
@@ -166,9 +164,8 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             return output;
         }
 
-
-        [Authorize(IdentityPermissions.Users.Create)]
-        public async Task<Guid> CreateUserAsync(CreateOrUpdateUserInput input)
+        public async Task<Guid> CreateUserAsync(CreateOrUpdateUserInput input, 
+            Action<IdentityUser> extraCallback = null)
         {
             // todo: Check max user restriction 
 
@@ -223,6 +220,11 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                 }
             }
 
+            if (extraCallback != null)
+            {
+                extraCallback.Invoke(user);
+            }
+
             (await IdentityUserManager.UpdateAsync(user)).CheckErrors();
 
             await CurrentUnitOfWork.SaveChangesAsync(); // Next make sense to send notifications 
@@ -250,8 +252,8 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             return user.Id;
         }
 
-        [Authorize(IdentityPermissions.Users.Update)]
-        public async Task UpdateUserAsync(CreateOrUpdateUserInput input)
+        public async Task UpdateUserAsync(CreateOrUpdateUserInput input,
+             Action<IdentityUser> extraCallback = null)
         {
 
             // Normalize values so that we can leverage the helper 
@@ -284,6 +286,8 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                     user.SetProperty(p.Key, p.Value);
                 }
             }
+
+            extraCallback?.Invoke(user);
 
             (await IdentityUserManager.UpdateAsync(user)).CheckErrors();
 
@@ -334,7 +338,6 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             }
         }
 
-        [Authorize(IdentityPermissions.Users.Update)]
         public async Task ResetUserPasswordAsync(Guid id, ResetUserPasswordDto input, bool runValidator)
         {
             var user = await IdentityUserManager.GetByIdAsync(id);
@@ -377,7 +380,6 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             await LocalEventBus.PublishAsync(passwordChangedEvent);
         }
 
-        [Authorize(IdentityPermissions.Users.ManagePermissions)]
         public async Task<GetUserPermissionsForEditOutput> GetUserPermissionsForEditAsync(Guid input)
         {
             var user = await IdentityUserManager.GetByIdAsync(input);
@@ -401,7 +403,6 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             };
         }
 
-        [Authorize(IdentityPermissions.Users.ManagePermissions)]
         public async Task UpdateUserPermissionsAsync(UpdateUserPermissionsInput input)
         {
             var user = await IdentityUserManager.GetByIdAsync(input.Id);
@@ -411,7 +412,6 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             await UserPermissionAppService.SetGrantedPermissionsAsync(user, normlizedPermissions);
         }
 
-        [Authorize(IdentityPermissions.Users.ManagePermissions)]
         public async Task ResetUserSpecificPermissionsAsync(Guid id)
         {
             var user = await IdentityUserManager.GetByIdAsync(id);
@@ -419,7 +419,6 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
 
             await UserPermissionAppService.SetGrantedPermissionsAsync(user, normlizedPermissions);
         }
-
 
         protected virtual async Task UpdateUserByInput(IdentityUser user, UserEditDto input, ProfileChangedEvent changedEvent)
         {
