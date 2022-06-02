@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Identity;
 
 namespace PolpAbp.ZeroAdaptors.Authorization.Users
 {
@@ -11,8 +12,9 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
         /// Creates a user with the given information.
         /// </summary>
         /// <param name="input">User information</param>
+        /// <param name="extraCallback">Extra change on user</param>
         /// <returns>Task with the newly created user ID</returns>
-        Task<Guid> CreateUserAsync(CreateOrUpdateUserInput input);
+        Task<Guid> CreateUserAsync(CreateOrUpdateUserInput input, Action<IdentityUser> extraCallback = null);
         /// <summary>
         /// Gets the necessary information for creating a user.
         /// </summary>
@@ -50,8 +52,9 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
         /// Updates a user with the given information.
         /// </summary>
         /// <param name="input">User information</param>
+        /// <param name="extraCallback">Extra callback</param>
         /// <returns>Task</returns>
-        Task UpdateUserAsync(CreateOrUpdateUserInput input);
+        Task UpdateUserAsync(CreateOrUpdateUserInput input, Action<IdentityUser> extraCallback = null);
         /// <summary>
         /// Updates a user's permission with the given information.
         /// </summary>
