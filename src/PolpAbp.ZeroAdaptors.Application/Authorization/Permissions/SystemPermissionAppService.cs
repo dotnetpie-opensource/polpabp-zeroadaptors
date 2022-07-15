@@ -5,10 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Volo.Abp.Authorization.Permissions;
+using Volo.Abp.Caching;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Guids;
 using Volo.Abp.Identity;
 using Volo.Abp.MultiTenancy;
+using Volo.Abp.SimpleStateChecking;
 using PermissionManager = Volo.Abp.PermissionManagement.PermissionManager;
 
 namespace PolpAbp.ZeroAdaptors.Authorization.Permissions
@@ -25,13 +27,14 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Permissions
     [ExposeServices(typeof(ISystemPermissionAppService))]
     public class SystemPermissionAppService : PermissionManager, ISystemPermissionAppService, ISingletonDependency
     {
-        public SystemPermissionAppService(IPermissionDefinitionManager permissionDefinitionManager,
-            Volo.Abp.PermissionManagement.IPermissionGrantRepository permissionGrantRepository,
-            IServiceProvider serviceProvider,
-            IGuidGenerator guidGenerator,
-            IOptions<Volo.Abp.PermissionManagement.PermissionManagementOptions> options,
-            ICurrentTenant currentTenant
-            ) : base(permissionDefinitionManager, permissionGrantRepository, serviceProvider, guidGenerator, options, currentTenant)
+        public SystemPermissionAppService(IPermissionDefinitionManager permissionDefinitionManager, 
+            ISimpleStateCheckerManager<PermissionDefinition> simpleStateCheckerManager, 
+            Volo.Abp.PermissionManagement.IPermissionGrantRepository permissionGrantRepository, 
+            IServiceProvider serviceProvider, IGuidGenerator guidGenerator, 
+            IOptions<Volo.Abp.PermissionManagement.PermissionManagementOptions> options, 
+            ICurrentTenant currentTenant, 
+            IDistributedCache<Volo.Abp.PermissionManagement.PermissionGrantCacheItem> cache) 
+            : base(permissionDefinitionManager, simpleStateCheckerManager, permissionGrantRepository, serviceProvider, guidGenerator, options, currentTenant, cache)
         {
         }
 

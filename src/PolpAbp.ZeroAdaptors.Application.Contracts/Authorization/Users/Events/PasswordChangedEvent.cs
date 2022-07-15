@@ -11,11 +11,11 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Events
         public Guid? OperatorId { get; set; }
         public string NewPassword { get; set; }
 
-        public Dictionary<string, object> ExtraProperties { get; set; }
+        public ExtraPropertyDictionary ExtraProperties { get; set; }
 
         public PasswordChangedEvent()
         {
-            ExtraProperties = new Dictionary<string, object>();
+            ExtraProperties = new ExtraPropertyDictionary();
         }
     }
 }

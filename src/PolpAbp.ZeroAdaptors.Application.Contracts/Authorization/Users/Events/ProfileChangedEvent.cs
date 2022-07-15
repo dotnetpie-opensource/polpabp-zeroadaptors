@@ -13,12 +13,12 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Events
         public bool IsNew { get; set; }
         public bool SendActivationEmail { get; set; }
 
-        public Dictionary<string, object> ExtraProperties {get;set; }
+        public ExtraPropertyDictionary ExtraProperties {get;set; }
 
         public ProfileChangedEvent()
         {
             ChangedFields = new List<string>();
-            ExtraProperties = new Dictionary<string, object>();
+            ExtraProperties = new ExtraPropertyDictionary();
         }
     }
 }
