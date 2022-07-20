@@ -7,7 +7,7 @@ using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement;
 using Volo.Abp.PermissionManagement.Identity;
 using Volo.Abp.TenantManagement;
-using Volo.Abp.TextTemplating;
+using Volo.Abp.TextTemplating.Scriban;
 using Volo.Abp.UI.Navigation;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
@@ -25,7 +25,7 @@ namespace PolpAbp.ZeroAdaptors
         typeof(AbpIdentityDomainModule),
         typeof(AbpPermissionManagementDomainIdentityModule),
         typeof(AbpAccountApplicationContractsModule),
-        typeof(AbpTextTemplatingModule),
+        typeof(AbpTextTemplatingScribanModule),
         typeof(AbpEmailingModule),
         typeof(AbpUiNavigationModule)
     )]
@@ -41,6 +41,11 @@ namespace PolpAbp.ZeroAdaptors
             Configure<AppUrlOptions>(options =>
             {
                 options.Applications["MVC"].Urls[ZeroAdaptorsUrlNames.EmailActivation] = "Account/EmailActivation";
+            });
+
+            Configure<AbpVirtualFileSystemOptions>(options =>
+            {
+                options.FileSets.AddEmbedded<PolpAbpZeroAdaptorsApplicationModule>("PolpAbp.ZeroAdaptors");
             });
 
         }
