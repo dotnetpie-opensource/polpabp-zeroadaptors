@@ -1,5 +1,6 @@
 ﻿using Volo.Abp.Account.Localization;
 using Volo.Abp.Emailing.Templates;
+using Volo.Abp.TextTemplating.Scriban;
 using Volo.Abp.Localization;
 using Volo.Abp.TextTemplating;
 
@@ -16,6 +17,7 @@ namespace PolpAbp.ZeroAdaptors.Emailing.Account.Templates
                                layout: StandardEmailTemplates.Layout,
                                localizationResource: typeof(AccountResource)
                            ).WithVirtualFilePath("/Emailing/Account/Templates/EmailActivationLink.tpl", true)
+                           .WithScribanEngine()
                        );
         }
     }

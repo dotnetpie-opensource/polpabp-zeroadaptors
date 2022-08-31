@@ -19,11 +19,11 @@ namespace PolpAbp.ZeroAdaptors.Organizations.Dto
 
         public DateTime AddedTime { get; set; }
 
-        public Dictionary<string, object> ExtraProperties { get; set; }
+        public ExtraPropertyDictionary ExtraProperties { get; set; }
 
         public OrganizationUnitUserListDto()
         {
-            ExtraProperties = new Dictionary<string, object>();
+            ExtraProperties = new ExtraPropertyDictionary();
         }
     }
 }

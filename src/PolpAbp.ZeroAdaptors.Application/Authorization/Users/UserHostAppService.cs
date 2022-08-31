@@ -18,17 +18,14 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
         protected readonly IdentityUserManager IdentityUserManager;
         protected readonly ILocalEventBus LocalEventBus;
         protected readonly IUserIdentityAssistantAppService UserIdentityAssistantAppService;
-        protected readonly IDataFilter DataFilter;
 
         public UserHostAppService(IdentityUserManager identityUserManager,
             ILocalEventBus localEventBus,
-            IUserIdentityAssistantAppService userIdentityAssistantAppService,
-            IDataFilter dataFilter)
+            IUserIdentityAssistantAppService userIdentityAssistantAppService)
         {
             IdentityUserManager = identityUserManager;
             LocalEventBus = localEventBus;
             UserIdentityAssistantAppService = userIdentityAssistantAppService;
-            DataFilter = dataFilter;
         }
 
         public async Task<IdentityUser> GetUserAcrossSystem(string email)
