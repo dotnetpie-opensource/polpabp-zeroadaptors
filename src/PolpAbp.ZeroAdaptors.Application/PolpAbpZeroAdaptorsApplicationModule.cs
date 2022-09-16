@@ -9,25 +9,23 @@ using Volo.Abp.PermissionManagement.Identity;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TextTemplating.Scriban;
 using Volo.Abp.UI.Navigation;
-using Volo.Abp.UI.Navigation.Urls;
-using Volo.Abp.VirtualFileSystem;
 
 namespace PolpAbp.ZeroAdaptors
 {
     [DependsOn(
-        typeof(PolpAbpFrameworkApplicationContractsModule),
-        typeof(PolpAbpFrameworkApplicationModule),
-        typeof(PolpAbpZeroAdaptorsDomainModule),
-        typeof(PolpAbpZeroAdaptorsCoreSharedModule),
-        typeof(PolpAbpZeroAdaptorsApplicationContactsModule),
-        typeof(AbpPermissionManagementDomainModule),
         typeof(AbpTenantManagementDomainModule),
-        typeof(AbpIdentityDomainModule),
+        typeof(AbpPermissionManagementDomainModule),
         typeof(AbpPermissionManagementDomainIdentityModule),
+        typeof(AbpIdentityDomainModule),
         typeof(AbpAccountApplicationContractsModule),
         typeof(AbpTextTemplatingScribanModule),
         typeof(AbpEmailingModule),
-        typeof(AbpUiNavigationModule)
+        typeof(AbpUiNavigationModule),
+        typeof(PolpAbpFrameworkApplicationContractsModule),
+        typeof(PolpAbpFrameworkApplicationModule),
+        typeof(PolpAbpZeroAdaptorsCoreSharedModule),
+        typeof(PolpAbpZeroAdaptorsDomainModule),
+        typeof(PolpAbpZeroAdaptorsApplicationContactsModule)
     )]
     public class PolpAbpZeroAdaptorsApplicationModule : AbpModule
     {
@@ -37,17 +35,6 @@ namespace PolpAbp.ZeroAdaptors
             {
                 options.AddMaps<PolpAbpZeroAdaptorsApplicationModule>();
             });
-
-            Configure<AppUrlOptions>(options =>
-            {
-                options.Applications["MVC"].Urls[ZeroAdaptorsUrlNames.EmailActivation] = "Account/EmailActivation";
-            });
-
-            Configure<AbpVirtualFileSystemOptions>(options =>
-            {
-                options.FileSets.AddEmbedded<PolpAbpZeroAdaptorsApplicationModule>("PolpAbp.ZeroAdaptors");
-            });
-
         }
     }
 }

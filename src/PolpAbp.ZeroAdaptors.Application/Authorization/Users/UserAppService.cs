@@ -135,9 +135,9 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                 PhoneNumber = user.PhoneNumber,
                 IsTwoFactorEnabled = user.TwoFactorEnabled,
                 IsLockoutEnabled = user.LockoutEnabled,
-                ShouldChangePasswordOnNextLogin = user.ShouldChangePasswordOnNextLogin()
+                ShouldChangePasswordOnNextLogin = user.ShouldChangePasswordOnNextLogin(),
+                IsActive = user.IsActive
                 // todo:
-                // isactive
                 // ....
             };
             // Extra properties 
@@ -454,6 +454,9 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             {
                 (await IdentityUserManager.SetRolesAsync(user, input.RoleNames)).CheckErrors();
             }
+
+            // Active
+            user.SetIsActive(input.IsActive);
 
             if (input.ShouldChangePasswordOnNextLogin)
             {

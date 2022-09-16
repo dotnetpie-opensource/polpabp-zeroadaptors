@@ -1,5 +1,4 @@
 ﻿using PolpAbp.Framework;
-using Volo.Abp.Account.Localization;
 using Volo.Abp.Application;
 using Volo.Abp.Authorization;
 using Volo.Abp.BackgroundJobs;
@@ -13,16 +12,16 @@ using Volo.Abp.VirtualFileSystem;
 namespace PolpAbp.ZeroAdaptors
 {
     [DependsOn(
-        typeof(PolpAbpFrameworkApplicationContractsModule),
-        typeof(PolpAbpZeroAdaptorsCoreSharedModule),
-        typeof(AbpDddApplicationContractsModule),
         typeof(AbpDddDomainModule),
-        typeof(AbpAuthorizationModule),
-        typeof(AbpIdentityDomainModule),
-        typeof(AbpIdentityApplicationContractsModule),
-        typeof(AbpIdentityDomainSharedModule),
         typeof(AbpLocalizationAbstractionsModule), // localization
-        typeof(AbpBackgroundJobsAbstractionsModule)
+        typeof(AbpDddApplicationContractsModule),
+        typeof(AbpIdentityDomainModule),
+        typeof(AbpIdentityDomainSharedModule),
+        typeof(AbpIdentityApplicationContractsModule),
+        typeof(AbpAuthorizationModule),
+        typeof(AbpBackgroundJobsAbstractionsModule),
+        typeof(PolpAbpFrameworkApplicationContractsModule),
+        typeof(PolpAbpZeroAdaptorsCoreSharedModule)
     )]
     public class PolpAbpZeroAdaptorsApplicationContactsModule : AbpModule
     {
