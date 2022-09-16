@@ -27,13 +27,4 @@
 	<PackageReference Include="Volo.Abp.PermissionManagement.Domain.Identity" Version="5.3.2" />
   </ItemGroup>
    
-  <ItemGroup>
-    <EmbeddedResource Include="Emailing\Account\Templates\*.tpl" />
-    <None Remove="Emailing\Account\Templates\*.tpl" />
-  </ItemGroup>        
-    
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="6.0.5" />
-  </ItemGroup>    
-
 </Project>
