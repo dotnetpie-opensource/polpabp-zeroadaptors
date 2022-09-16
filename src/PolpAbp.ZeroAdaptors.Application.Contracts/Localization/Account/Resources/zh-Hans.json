@@ -1,9 +1,0 @@
-﻿{
-  "culture": "zh-Hans",
-  "texts": {
-    "EmailActivation_Subject": "激活您的用户账号",
-    "EmailActivation_Title": "欢迎使用系统.",
-    "EmailActivation_SubTitle": "您的邮箱地址是系统和您之间的重要通信渠道。",
-    "EmailActivation_ClickTheLinkBelowToVerifyYourEmail": "请点击以下链接确认您的邮箱地址,并激活您的用户账号:"
-  }
-}

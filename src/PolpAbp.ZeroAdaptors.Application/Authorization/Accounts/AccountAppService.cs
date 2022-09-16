@@ -1,10 +1,10 @@
-﻿using PolpAbp.ZeroAdaptors.Authorization.Accounts.Dto;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using PolpAbp.Framework.Emailing.Account;
+using PolpAbp.ZeroAdaptors.Authorization.Accounts.Dto;
 using Volo.Abp;
 using Volo.Abp.TenantManagement;
 using IUnderlyingAccountAppService = Volo.Abp.Account.IAccountAppService;
-using PolpAbp.ZeroAdaptors.Emailing.Account;
 
 namespace PolpAbp.ZeroAdaptors.Authorization.Accounts
 {
@@ -13,15 +13,15 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Accounts
     {
         private readonly ITenantRepository _tenantRepository;
         private readonly IUnderlyingAccountAppService _underlyingAccountApp;
-        private readonly IZeroAdaptorsAccountEmailer _zeroAdaptorsAccountEmailer;
+        private readonly IFrameworkAccountEmailer _accountEmailer;
 
         public AccountAppService(ITenantRepository tenantRepository,
             IUnderlyingAccountAppService underlyingAccountApp,
-            IZeroAdaptorsAccountEmailer zeroAdaptorsAccountEmailer)
+            IFrameworkAccountEmailer accountEmailer)
         {
             _tenantRepository = tenantRepository;
             _underlyingAccountApp = underlyingAccountApp;
-            _zeroAdaptorsAccountEmailer = zeroAdaptorsAccountEmailer;
+            _accountEmailer = accountEmailer;
         }
 
         public Task ActivateEmail(ActivateEmailInput input)
@@ -71,9 +71,9 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Accounts
             throw new NotImplementedException();
         }
 
-        public async Task SendEmailActivationLink(SendEmailActivationLinkInput input)
+        public Task SendEmailActivationLink(SendEmailActivationLinkInput input)
         {
-            await _zeroAdaptorsAccountEmailer.SendEmailActivationLinkAsync(input.EmailAddress);
+            throw new NotImplementedException();
         }
 
         public async Task SendPasswordResetCode(SendPasswordResetCodeInput input)

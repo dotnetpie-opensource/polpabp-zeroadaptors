@@ -22,11 +22,6 @@
   </ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="Localization\Account\Resources\*.json" />
-		<Content Remove="Localization\Account\Resources\*.json" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<EmbeddedResource Include="Localization\MultiTenancy\Resources\*.json" />
 		<Content Remove="Localization\MultiTenancy\Resources\*.json" />
 	</ItemGroup>

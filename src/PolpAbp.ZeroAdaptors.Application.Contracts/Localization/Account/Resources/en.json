@@ -1,9 +1,0 @@
-﻿{
-  "culture": "en",
-  "texts": {
-    "EmailActivation_Subject": "Verify your email",
-    "EmailActivation_Title": "Please verify your email",
-    "EmailActivation_SubTitle": "Your email is the commuication channel between you and the service.",
-    "EmailActivation_ClickTheLinkBelowToVerifyYourEmail": "Please click the link below to verify your email address:"
-  }
-}

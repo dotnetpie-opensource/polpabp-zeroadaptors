@@ -36,10 +36,6 @@ namespace PolpAbp.ZeroAdaptors
             Configure<AbpLocalizationOptions>(options =>
             {
                 options.Resources
-                    .Get<AccountResource>()
-                    .AddVirtualJson("/Localization/Account/Resources");
-
-                options.Resources
                     .Get<AbpTenantManagementResource>()
                     .AddVirtualJson("/Localization/MultiTenancy/Resources");
             });
