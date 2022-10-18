@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using PolpAbp.Framework.Authorization.Users;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Dto;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Events;
 using System;
 using System.Threading.Tasks;
 using Volo.Abp;
-using Volo.Abp.Data;
 using Volo.Abp.EventBus.Local;
 using Volo.Abp.Identity;
 using Volo.Abp.MultiTenancy;

@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
+using PolpAbp.Framework.Authorization.Users;
 using PolpAbp.Framework.Identity;
 using PolpAbp.ZeroAdaptors.Authorization.Permissions;
 using PolpAbp.ZeroAdaptors.Authorization.Permissions.Dto;

@@ -1,4 +1,4 @@
-﻿using PolpAbp.ZeroAdaptors.Security;
+﻿using PolpAbp.Framework.Security;
 
 namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile.Dto
 {

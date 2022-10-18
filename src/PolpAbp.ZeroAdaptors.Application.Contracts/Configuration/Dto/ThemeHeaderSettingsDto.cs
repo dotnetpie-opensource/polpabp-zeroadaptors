@@ -12,4 +12,4 @@ namespace PolpAbp.ZeroAdaptors.Configuration.Dto
 
         public bool HeaderMenuArrows { get; set; }
     }
-}
+}   
