@@ -36,7 +36,7 @@ namespace PolpAbp.ZeroAdaptors
             {
                 options.Resources
                     .Get<AbpTenantManagementResource>()
-                    .AddVirtualJson("/Localization/MultiTenancy/Resources");
+                    .AddVirtualJson("/Localization/ZeroAdaptors/MultiTenancy");
             });
 
         }
