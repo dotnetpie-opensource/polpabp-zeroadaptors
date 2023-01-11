@@ -22,8 +22,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="Localization\ZeroAdaptors\MultiTenancy\*.json" />
-		<Content Remove="Localization\ZeroAdaptors\MultiTenancy\*.json" />
+		<EmbeddedResource Include="Localization\PolpAbp\ZeroAdaptors\MultiTenancy\*.json" />
+		<Content Remove="Localization\PolpAbp\ZeroAdaptors\MultiTenancy\*.json" />
 	</ItemGroup>
 
 	<ItemGroup>
