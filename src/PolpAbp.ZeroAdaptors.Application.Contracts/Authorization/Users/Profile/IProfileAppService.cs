@@ -1,9 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Dto;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Profile.Dto;
-using PolpAbp.ZeroAdaptors.Authorization.Users.Events;
+using System;
+using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 
 namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile

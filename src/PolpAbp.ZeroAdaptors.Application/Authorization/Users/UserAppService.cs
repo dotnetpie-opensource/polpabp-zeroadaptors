@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using PolpAbp.Framework.Authorization.Users;
+using PolpAbp.Framework.Authorization.Users.Events;
 using PolpAbp.Framework.Identity;
 using PolpAbp.ZeroAdaptors.Authorization.Permissions;
 using PolpAbp.ZeroAdaptors.Authorization.Permissions.Dto;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Dto;
-using PolpAbp.ZeroAdaptors.Authorization.Users.Events;
 using PolpAbp.ZeroAdaptors.Organizations.Dto;
 using System;
 using System.Collections.Generic;

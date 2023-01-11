@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using PolpAbp.Framework.Authorization.Users;
+using PolpAbp.Framework.Authorization.Users.Events;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Dto;
-using PolpAbp.ZeroAdaptors.Authorization.Users.Events;
 using System;
 using System.Threading.Tasks;
 using Volo.Abp;
