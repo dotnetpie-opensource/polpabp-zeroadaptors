@@ -23,6 +23,7 @@ namespace PolpAbp.ZeroAdaptors
         typeof(AbpUiNavigationModule),
         typeof(PolpAbpFrameworkApplicationContractsModule),
         typeof(PolpAbpFrameworkApplicationModule),
+        typeof(PolpAbpFrameworkAbpExtensionsModule),
         typeof(PolpAbpZeroAdaptorsCoreSharedModule),
         typeof(PolpAbpZeroAdaptorsDomainModule),
         typeof(PolpAbpZeroAdaptorsApplicationContactsModule)
