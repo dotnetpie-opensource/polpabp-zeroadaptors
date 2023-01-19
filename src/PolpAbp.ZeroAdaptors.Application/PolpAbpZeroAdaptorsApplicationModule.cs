@@ -1,4 +1,5 @@
 ﻿using PolpAbp.Framework;
+using PolpAbp.Framework.AbpExtensions.Identity;
 using Volo.Abp.Account;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Emailing;
@@ -24,6 +25,7 @@ namespace PolpAbp.ZeroAdaptors
         typeof(PolpAbpFrameworkApplicationContractsModule),
         typeof(PolpAbpFrameworkApplicationModule),
         typeof(PolpAbpFrameworkAbpExtensionsModule),
+        typeof(PolpAbpFrameworkAbpExtensionsIdentityModule),
         typeof(PolpAbpZeroAdaptorsCoreSharedModule),
         typeof(PolpAbpZeroAdaptorsDomainModule),
         typeof(PolpAbpZeroAdaptorsApplicationContactsModule)
