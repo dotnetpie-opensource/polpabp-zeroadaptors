@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using PolpAbp.Framework.Authorization.Users;
 using PolpAbp.Framework.Authorization.Users.Events;
 using PolpAbp.Framework.Security;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Dto;
@@ -16,13 +17,16 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
     public class ProfileAppService : ZeroAdaptorsAppService, IProfileAppService
     {
         protected readonly IdentityUserManager IdentityUserManager;
+        protected readonly IUserIdentityAssistantAppService UserIdentityAssistantAppService;
         protected readonly ILocalEventBus LocalEventBus;
 
         public ProfileAppService(IdentityUserManager identityUserManager, 
-            ILocalEventBus localEventBus)
+            ILocalEventBus localEventBus,
+            IUserIdentityAssistantAppService userIdentityAssistantAppService)
         {
             IdentityUserManager = identityUserManager;
             LocalEventBus = localEventBus;
+            UserIdentityAssistantAppService = userIdentityAssistantAppService;
         }
 
         public Task ChangeLanguage(ChangeUserLanguageDto input)
@@ -66,15 +70,12 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
             throw new NotImplementedException();
         }
 
-        public Task<GetPasswordComplexitySettingOutput> GetPasswordComplexitySettingAsync()
+        public async Task<GetPasswordComplexitySettingOutput> GetPasswordComplexitySettingAsync()
         {
-            return Task.Run(() =>
-            {
-                // TODO: Read from setting manager
-                var output = new GetPasswordComplexitySettingOutput();
-                output.Setting = PasswordComplexitySetting.DefaultSettings;
-                return output;
-            });
+            // TODO: Read from setting manager
+            var output = new GetPasswordComplexitySettingOutput();
+            output.Setting = await UserIdentityAssistantAppService.ReadInPasswordComplexityAsync();
+            return output;
         }
 
         public Task<GetProfilePictureOutput> GetProfilePicture()
