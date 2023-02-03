@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using PolpAbp.Framework.Authorization.Users;
 using PolpAbp.Framework.Authorization.Users.Events;
 using PolpAbp.Framework.Globalization;
-using PolpAbp.Framework.Identity;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Dto;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Profile.Dto;
 using System;
@@ -123,7 +122,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
             {
                 // 15 min
                 var code = await VerificationCodeManager.GenerateAsync(
-                    codeCacheKey: $"DangerousOperationPhoneVerification:{phoneNumberDetail.E164PhoneNumber}",
+                    codeCacheKey: $"DangerousOperationPhoneVerification:{CurrentUser.Id!.Value}",
                     codeCacheLifespan: TimeSpan.FromMinutes(15),
                     configuration: VerificationCodeConfiguration);
                 
@@ -193,23 +192,14 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
 
         public async Task VerifySmsCode(VerifySmsCodeInputDto input)
         {
-            var phoneNumberDetail = PhoneNumberService.Parse(input.PhoneNumber);
-            if (phoneNumberDetail.IsValid)
-            {
-                var result = await VerificationCodeManager.ValidateAsync(
-                    codeCacheKey: $"DangerousOperationPhoneVerification:{phoneNumberDetail.E164PhoneNumber}",
-                    verificationCode: input.Code,
-                    configuration: new VerificationCodeConfiguration());
+            var result = await VerificationCodeManager.ValidateAsync(
+                codeCacheKey: $"DangerousOperationPhoneVerification:{CurrentUser.Id!.Value}",
+                verificationCode: input.Code,
+                configuration: new VerificationCodeConfiguration());
 
-                if (!result)
-                {
-                    throw new Exception("Code cannot be verified.");
-                } 
-                    
-            }
-            else
+            if (!result)
             {
-                throw new Exception("Not valid phone number");
+                throw new Exception("Code cannot be verified.");
             }
         }
     }
