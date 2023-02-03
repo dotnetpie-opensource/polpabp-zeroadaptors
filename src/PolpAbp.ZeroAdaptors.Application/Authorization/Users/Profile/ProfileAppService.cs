@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Identity;
+using EasyAbp.Abp.VerificationCode;
+using Microsoft.AspNetCore.Identity;
 using PolpAbp.Framework.Authorization.Users;
 using PolpAbp.Framework.Authorization.Users.Events;
-using PolpAbp.Framework.Security;
+using PolpAbp.Framework.Globalization;
+using PolpAbp.Framework.Identity;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Dto;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Profile.Dto;
 using System;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.EventBus.Local;
+using Volo.Abp.Sms;
 using IdentityUserManager = Volo.Abp.Identity.IdentityUserManager;
 
 namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
@@ -19,14 +22,28 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
         protected readonly IdentityUserManager IdentityUserManager;
         protected readonly IUserIdentityAssistantAppService UserIdentityAssistantAppService;
         protected readonly ILocalEventBus LocalEventBus;
+        // todo: Life the specific image service to be a factor, and then
+        // user the Ioc to resolve....
+        protected readonly ISmsSender SmsSender;
+        protected readonly IPhoneNumberService PhoneNumberService;
+        protected readonly IVerificationCodeManager VerificationCodeManager;
+        protected readonly VerificationCodeConfiguration VerificationCodeConfiguration;
 
         public ProfileAppService(IdentityUserManager identityUserManager, 
             ILocalEventBus localEventBus,
-            IUserIdentityAssistantAppService userIdentityAssistantAppService)
+            IUserIdentityAssistantAppService userIdentityAssistantAppService,
+            ISmsSender smsSender,
+            IPhoneNumberService phoneNumberService,
+            IVerificationCodeManager verificationCodeManager)
         {
             IdentityUserManager = identityUserManager;
             LocalEventBus = localEventBus;
             UserIdentityAssistantAppService = userIdentityAssistantAppService;
+            SmsSender = smsSender;
+            PhoneNumberService = phoneNumberService;
+            VerificationCodeManager = verificationCodeManager;  
+
+            VerificationCodeConfiguration = new VerificationCodeConfiguration();
         }
 
         public Task ChangeLanguage(ChangeUserLanguageDto input)
@@ -44,7 +61,8 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
                     new PasswordChangedEvent
                     {
                         TenantId = user.TenantId,
-                        UserId = user.Id
+                        UserId = user.Id,
+                        OperatorId = user.Id
                     });
             }
             return ret;
@@ -88,14 +106,36 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
             throw new NotImplementedException();
         }
 
+        public Task<GetProfilePictureOutput> GetProfilePictureByUser(Guid userId)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task PrepareCollectedData()
         {
             throw new NotImplementedException();
         }
 
-        public Task SendVerificationSms(SendVerificationSmsInputDto input)
+        public async Task SendVerificationSms(SendVerificationSmsInputDto input)
         {
-            throw new NotImplementedException();
+            var phoneNumberDetail = PhoneNumberService.Parse(input.PhoneNumber);
+            if (phoneNumberDetail.IsValid)
+            {
+                // 15 min
+                var code = await VerificationCodeManager.GenerateAsync(
+                    codeCacheKey: $"DangerousOperationPhoneVerification:{phoneNumberDetail.E164PhoneNumber}",
+                    codeCacheLifespan: TimeSpan.FromMinutes(15),
+                    configuration: VerificationCodeConfiguration);
+                
+                var body = $@"Your phone verification code is: {code}. It will get expired in 15 mins.";
+                var msg = new SmsMessage(phoneNumberDetail.E164PhoneNumber, body);
+                // Set up the originator.
+                msg.Properties.Add("CountryCode", phoneNumberDetail.CountryAlpha);
+                await SmsSender.SendAsync(msg);
+                return;
+            }
+
+            throw new Exception("Not valid number");
         }
 
         public async Task UpdateCurrentUserProfileAsync(CurrentUserProfileEditDto input)
@@ -119,8 +159,12 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
             }
             if (!string.IsNullOrEmpty(input.PhoneNumber))
             {
-                (await IdentityUserManager.SetPhoneNumberAsync(user, input.PhoneNumber)).CheckErrors();
-                changedEvent.ChangedFields.Add(nameof(user.PhoneNumber));
+                var phoneNumberDetail = PhoneNumberService.Parse(input.PhoneNumber);
+                if (phoneNumberDetail.IsValid)
+                {
+                    (await IdentityUserManager.SetPhoneNumberAsync(user, phoneNumberDetail.E164PhoneNumber)).CheckErrors();
+                    changedEvent.ChangedFields.Add(nameof(user.PhoneNumber));
+                }
             }
             if (!string.Equals(user.Name, input.Name))
             {
@@ -147,9 +191,26 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
             throw new NotImplementedException();
         }
 
-        public Task VerifySmsCode(VerifySmsCodeInputDto input)
+        public async Task VerifySmsCode(VerifySmsCodeInputDto input)
         {
-            throw new NotImplementedException();
+            var phoneNumberDetail = PhoneNumberService.Parse(input.PhoneNumber);
+            if (phoneNumberDetail.IsValid)
+            {
+                var result = await VerificationCodeManager.ValidateAsync(
+                    codeCacheKey: $"DangerousOperationPhoneVerification:{phoneNumberDetail.E164PhoneNumber}",
+                    verificationCode: input.Code,
+                    configuration: new VerificationCodeConfiguration());
+
+                if (!result)
+                {
+                    throw new Exception("Code cannot be verified.");
+                } 
+                    
+            }
+            else
+            {
+                throw new Exception("Not valid phone number");
+            }
         }
     }
 }

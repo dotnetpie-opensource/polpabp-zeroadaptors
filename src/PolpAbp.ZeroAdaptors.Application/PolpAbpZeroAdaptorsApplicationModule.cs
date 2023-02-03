@@ -6,6 +6,7 @@ using Volo.Abp.Identity;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement;
 using Volo.Abp.PermissionManagement.Identity;
+using Volo.Abp.Sms;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TextTemplating.Scriban;
 using Volo.Abp.UI.Navigation;
@@ -20,6 +21,7 @@ namespace PolpAbp.ZeroAdaptors
         typeof(AbpAccountApplicationContractsModule),
         typeof(AbpTextTemplatingScribanModule),
         typeof(AbpEmailingModule),
+        typeof(AbpSmsModule),
         typeof(AbpUiNavigationModule),
         typeof(PolpAbpFrameworkApplicationContractsModule),
         typeof(PolpAbpFrameworkApplicationModule),
@@ -27,7 +29,9 @@ namespace PolpAbp.ZeroAdaptors
         typeof(PolpAbpFrameworkAbpExtensionsIdentityModule),
         typeof(PolpAbpZeroAdaptorsCoreSharedModule),
         typeof(PolpAbpZeroAdaptorsDomainModule),
-        typeof(PolpAbpZeroAdaptorsApplicationContactsModule)
+        typeof(PolpAbpZeroAdaptorsApplicationContactsModule),
+        // Verification code
+        typeof(EasyAbp.Abp.VerificationCode.AbpVerificationCodeModule)
     )]
     public class PolpAbpZeroAdaptorsApplicationModule : AbpModule
     {

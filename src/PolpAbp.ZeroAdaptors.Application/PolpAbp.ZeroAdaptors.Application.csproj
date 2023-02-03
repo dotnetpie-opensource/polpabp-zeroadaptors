@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<Import Project="..\..\common.props" />
+  <Import Project="..\..\common.props" />
 
-	<PropertyGroup>
+  <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>PolpAbp.ZeroAdaptors</RootNamespace>
     <GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>        
@@ -16,17 +16,19 @@
     <ProjectReference Include="..\PolpAbp.ZeroAdaptors.Core\PolpAbp.ZeroAdaptors.Core.csproj" />
     <ProjectReference Include="..\PolpAbp.ZeroAdaptors.Domain\PolpAbp.ZeroAdaptors.Domain.csproj" />
   </ItemGroup>
-    
+  
   <ItemGroup>
+    <PackageReference Include="EasyAbp.Abp.VerificationCode" Version="1.0.2" />
     <PackageReference Include="Volo.Abp.Account.Application.Contracts" Version="5.3.2" />
     <PackageReference Include="Volo.Abp.Ddd.Application" Version="5.3.2" />
-    <PackageReference Include="Volo.Abp.Identity.Domain" Version="5.3.2" />
-    <PackageReference Include="Volo.Abp.TenantManagement.Domain" Version="5.3.2" />
-    <PackageReference Include="Volo.Abp.UI.Navigation" Version="5.3.2" />
     <PackageReference Include="Volo.Abp.Emailing" Version="5.3.2" />
-    <PackageReference Include="Volo.Abp.TextTemplating" Version="5.3.2" />
+    <PackageReference Include="Volo.Abp.Identity.Domain" Version="5.3.2" />
     <PackageReference Include="Volo.Abp.PermissionManagement.Domain" Version="5.3.2" />
-	<PackageReference Include="Volo.Abp.PermissionManagement.Domain.Identity" Version="5.3.2" />
+    <PackageReference Include="Volo.Abp.PermissionManagement.Domain.Identity" Version="5.3.2" />
+    <PackageReference Include="Volo.Abp.Sms" Version="5.3.2" />
+    <PackageReference Include="Volo.Abp.TenantManagement.Domain" Version="5.3.2" />
+    <PackageReference Include="Volo.Abp.TextTemplating" Version="5.3.2" />
+    <PackageReference Include="Volo.Abp.UI.Navigation" Version="5.3.2" />
   </ItemGroup>
-   
+  
 </Project>
