@@ -61,5 +61,6 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
         Task VerifySmsCode(VerifySmsCodeInputDto input);
 
         Task PrepareCollectedData();
+        Task SendVerificationEmailAsync();
     }
 }

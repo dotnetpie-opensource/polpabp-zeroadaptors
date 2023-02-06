@@ -1,7 +1,9 @@
 using EasyAbp.Abp.VerificationCode;
 using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json.Linq;
 using PolpAbp.Framework.Authorization.Users;
 using PolpAbp.Framework.Authorization.Users.Events;
+using PolpAbp.Framework.Emailing.Account;
 using PolpAbp.Framework.Globalization;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Dto;
 using PolpAbp.ZeroAdaptors.Authorization.Users.Profile.Dto;
@@ -10,6 +12,7 @@ using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.EventBus.Local;
 using Volo.Abp.Sms;
+using Volo.Abp.Users;
 using IdentityUserManager = Volo.Abp.Identity.IdentityUserManager;
 
 namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
@@ -27,20 +30,23 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
         protected readonly IPhoneNumberService PhoneNumberService;
         protected readonly IVerificationCodeManager VerificationCodeManager;
         protected readonly VerificationCodeConfiguration VerificationCodeConfiguration;
+        protected readonly IFrameworkAccountEmailer FrameworkAccountEmailer;
 
-        public ProfileAppService(IdentityUserManager identityUserManager, 
+        public ProfileAppService(IdentityUserManager identityUserManager,
             ILocalEventBus localEventBus,
             IUserIdentityAssistantAppService userIdentityAssistantAppService,
             ISmsSender smsSender,
             IPhoneNumberService phoneNumberService,
-            IVerificationCodeManager verificationCodeManager)
+            IVerificationCodeManager verificationCodeManager,
+            IFrameworkAccountEmailer frameworkAccountEmailer)
         {
             IdentityUserManager = identityUserManager;
             LocalEventBus = localEventBus;
             UserIdentityAssistantAppService = userIdentityAssistantAppService;
             SmsSender = smsSender;
             PhoneNumberService = phoneNumberService;
-            VerificationCodeManager = verificationCodeManager;  
+            VerificationCodeManager = verificationCodeManager;
+            FrameworkAccountEmailer = frameworkAccountEmailer;
 
             VerificationCodeConfiguration = new VerificationCodeConfiguration();
         }
@@ -125,11 +131,9 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
                     codeCacheKey: $"DangerousOperationPhoneVerification:{CurrentUser.Id!.Value}",
                     codeCacheLifespan: TimeSpan.FromMinutes(15),
                     configuration: VerificationCodeConfiguration);
-                
+
                 var body = $@"Your phone verification code is: {code}. It will get expired in 15 mins.";
                 var msg = new SmsMessage(phoneNumberDetail.E164PhoneNumber, body);
-                // Set up the originator.
-                msg.Properties.Add("CountryCode", phoneNumberDetail.CountryAlpha);
                 await SmsSender.SendAsync(msg);
                 return;
             }
@@ -202,5 +206,11 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
                 throw new Exception("Code cannot be verified.");
             }
         }
+
+        public async Task SendVerificationEmailAsync()
+        {
+            await FrameworkAccountEmailer.SendEmailActivationLinkAsync(CurrentUser.Id!.Value);
+        }
+
     }
 }

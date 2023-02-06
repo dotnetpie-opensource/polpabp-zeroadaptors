@@ -49,7 +49,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
             var info = await _profileAppService.GetCurrentUserProfileForEditAsync();
             info.UserName = "another@gmail.com";
             info.EmailAddress = "another@gmail.com";
-            info.PhoneNumber = "5555555555";
+            info.PhoneNumber = "5926578157";
             info.Surname = "Hello";
             info.Name = "World";
             await _profileAppService.UpdateCurrentUserProfileAsync(info);
@@ -57,7 +57,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users.Profile
 
             Assert.Equal(info.EmailAddress.ToUpper(), newInfo.EmailAddress.ToUpper());
             Assert.Equal(info.UserName.ToUpper(), newInfo.UserName.ToUpper());
-            Assert.Equal(info.PhoneNumber.ToUpper(), newInfo.PhoneNumber.ToUpper());
+            Assert.Equal("+15926578157", newInfo.PhoneNumber.ToUpper());
             Assert.Equal(info.Name.ToUpper(), newInfo.Name.ToUpper());
             Assert.Equal(info.Surname.ToUpper(), newInfo.Surname.ToUpper());
         }
