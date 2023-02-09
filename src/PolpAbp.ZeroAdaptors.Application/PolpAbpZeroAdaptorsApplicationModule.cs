@@ -3,9 +3,11 @@ using Volo.Abp.Account;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Emailing;
 using Volo.Abp.Identity;
+using Volo.Abp.Ldap;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement;
 using Volo.Abp.PermissionManagement.Identity;
+using Volo.Abp.SettingManagement;
 using Volo.Abp.Sms;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TextTemplating.Scriban;
@@ -22,11 +24,14 @@ namespace PolpAbp.ZeroAdaptors
         typeof(AbpTextTemplatingScribanModule),
         typeof(AbpEmailingModule),
         typeof(AbpSmsModule),
+        typeof(AbpLdapModule),
+        typeof(AbpSettingManagementApplicationModule),
         typeof(AbpUiNavigationModule),
         typeof(PolpAbpFrameworkApplicationContractsModule),
         typeof(PolpAbpFrameworkApplicationModule),
         typeof(PolpAbpFrameworkAbpExtensionsModule),
         typeof(PolpAbpFrameworkAbpExtensionsIdentityModule),
+        typeof(PolpAbpFrameworkAbpExtensionsSettingsModule),
         typeof(PolpAbpZeroAdaptorsCoreSharedModule),
         typeof(PolpAbpZeroAdaptorsDomainModule),
         typeof(PolpAbpZeroAdaptorsApplicationContactsModule),
