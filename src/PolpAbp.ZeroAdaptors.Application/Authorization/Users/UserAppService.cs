@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using PolpAbp.Framework.Authorization.Users;
 using PolpAbp.Framework.Authorization.Users.Events;
+using PolpAbp.Framework.Globalization;
 using PolpAbp.Framework.Identity;
 using PolpAbp.ZeroAdaptors.Authorization.Permissions;
 using PolpAbp.ZeroAdaptors.Authorization.Permissions.Dto;
@@ -31,6 +32,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
         protected readonly IUserPermissionAppService UserPermissionAppService;
         protected readonly ILocalEventBus LocalEventBus;
         protected readonly IUserIdentityAssistantAppService UserIdentityAssistantAppService;
+        protected readonly IPhoneNumberService PhoneNumberService;
 
         public UserAppService(IIdentityRoleRepository identityRoleRepository,
             IOrganizationUnitRepository organizationUnitRepository,
@@ -40,7 +42,8 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             ISystemPermissionAppService systemPermissionAppService,
             IUserPermissionAppService userPermissionAppService,
             ILocalEventBus localEventBus,
-            IUserIdentityAssistantAppService userIdentityAssistantAppService
+            IUserIdentityAssistantAppService userIdentityAssistantAppService,
+            IPhoneNumberService phoneNumberService
             )
         {
             IdentityRoleRepository = identityRoleRepository;
@@ -52,6 +55,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             UserPermissionAppService = userPermissionAppService;
             LocalEventBus = localEventBus;
             UserIdentityAssistantAppService = userIdentityAssistantAppService;
+            PhoneNumberService = phoneNumberService;
         }
 
         public async Task<GetUserForEditOutput> GetUserForCreateAsync()
@@ -252,6 +256,19 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             return user.Id;
         }
 
+        public async Task DeleteUserAsync(Guid id)
+        {
+            var user = await IdentityUserManager.GetByIdAsync(id);
+            if (user == null)
+            {
+                // true 
+                return;
+            }
+
+            // todo: More clean up in the future.
+            await IdentityUserManager.DeleteAsync(user);
+        }
+
         public async Task UpdateUserAsync(CreateOrUpdateUserInput input,
              Action<IdentityUser> extraCallback = null)
         {
@@ -434,8 +451,12 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             }
             if (!string.Equals(user.PhoneNumber, input.PhoneNumber, StringComparison.InvariantCultureIgnoreCase))
             {
-                (await IdentityUserManager.SetPhoneNumberAsync(user, input.PhoneNumber)).CheckErrors();
-                changedEvent.ChangedFields.Add(nameof(user.PhoneNumber));
+                var phoneNumberDetail = PhoneNumberService.Parse(input.PhoneNumber);
+                if (phoneNumberDetail.IsValid)
+                {
+                    (await IdentityUserManager.SetPhoneNumberAsync(user, phoneNumberDetail.E164PhoneNumber)).CheckErrors();
+                    changedEvent.ChangedFields.Add(nameof(user.PhoneNumber));
+                }
             }
             if (!string.Equals(user.Name, input.Name))
             {
