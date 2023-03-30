@@ -52,7 +52,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                 }
             };
 
-            var id = await _userAppService.CreateUserAsync(inputModel);
+            var id = await _userAppService.CreateUserAsync(inputModel, null, true, true);
             Assert.True(true);
         }
 
@@ -73,7 +73,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                 }
             };
 
-            var id = await _userAppService.CreateUserAsync(inputModel);
+            var id = await _userAppService.CreateUserAsync(inputModel, null, true, true);
             Assert.True(true);
 
         }
@@ -98,7 +98,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                 }
             };
 
-            await _userAppService.UpdateUserAsync(newModel);
+            await _userAppService.UpdateUserAsync(newModel, null, true, true);
             Assert.True(true);
         }
 
@@ -123,7 +123,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                 }
             };
 
-            await _userAppService.UpdateUserAsync(newModel);
+            await _userAppService.UpdateUserAsync(newModel, null, true, true);
             Assert.True(true);
         }
 
@@ -148,7 +148,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                 }
             };
 
-            await _userAppService.UpdateUserAsync(newModel);
+            await _userAppService.UpdateUserAsync(newModel, null, true, true);
             Assert.True(true);
 
             var newUser = await _identityUserManager.GetByIdAsync(FrameworkTestConsts.MemberUserId1);
@@ -163,7 +163,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             {
                 Password = "1a2w3eA!"
             };
-            await _userAppService.ResetUserPasswordAsync(FrameworkTestConsts.MemberUserId1, inputDto, true);
+            await _userAppService.ResetUserPasswordAsync(FrameworkTestConsts.MemberUserId1, inputDto, true, true);
 
             var newUser = await _identityUserManager.GetByIdAsync(FrameworkTestConsts.MemberUserId1);
             var flag = await _identityUserManager.CheckPasswordAsync(newUser, inputDto.Password);
@@ -180,7 +180,7 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             };
             var ex = await Record.ExceptionAsync(async () =>
             {
-                await _userAppService.ResetUserPasswordAsync(FrameworkTestConsts.MemberUserId1, inputDto, true);
+                await _userAppService.ResetUserPasswordAsync(FrameworkTestConsts.MemberUserId1, inputDto, true, true);
             });
             Assert.Null(ex);
         }

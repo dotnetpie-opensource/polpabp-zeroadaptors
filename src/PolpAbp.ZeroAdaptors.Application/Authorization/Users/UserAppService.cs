@@ -168,11 +168,12 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             return output;
         }
 
-        public async Task<Guid> CreateUserAsync(CreateOrUpdateUserInput input, 
-            Action<IdentityUser> extraCallback = null)
+        public async Task<Guid> CreateUserAsync(CreateOrUpdateUserInput input,
+            Action<IdentityUser> extraCallback = null,
+            bool isProfileChangeSilent = false,
+            bool isPasswordChangeSilent = false)
         {
             // todo: Check max user restriction 
-
 
             // Normalize values so that we can leverage the helper 
             // method to set up roles and other. 
@@ -207,9 +208,9 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             {
                 TenantId = CurrentTenant.Id,
                 OperatorId = CurrentUser?.Id,
-                UserId  = user.Id,
+                UserId = user.Id,
                 SendActivationEmail = input.SendActivationEmail
-            }; 
+            };
             await UpdateUserByInput(user, input.User, changedEvent);
 
             foreach (var p in input.User.ExtraProperties)
@@ -240,18 +241,24 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             // Next seed data for this user, e.g., user role and so on.
             await RegisteredUserDataSeeder.SeedAsync(input.User.EmailAddress, CurrentTenant.Id);
 
-            await LocalEventBus.PublishAsync(changedEvent);
-
-            // Should change password on next login
-            var passwordChangedEvent = new PasswordChangedEvent()
+            if (!isProfileChangeSilent)
             {
-                UserId = user.Id,
-                OperatorId = CurrentUser?.Id,
-                TenantId = CurrentUser.TenantId,
-                NewPassword = input.User.Password
-            };
+                await LocalEventBus.PublishAsync(changedEvent);
+            }
 
-            await LocalEventBus.PublishAsync(passwordChangedEvent);
+            if (!isPasswordChangeSilent)
+            {
+                // Should change password on next login
+                var passwordChangedEvent = new PasswordChangedEvent()
+                {
+                    UserId = user.Id,
+                    OperatorId = CurrentUser?.Id,
+                    TenantId = CurrentUser.TenantId,
+                    NewPassword = input.User.Password
+                };
+
+                await LocalEventBus.PublishAsync(passwordChangedEvent);
+            }
 
             return user.Id;
         }
@@ -269,8 +276,10 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
             await IdentityUserManager.DeleteAsync(user);
         }
 
-        public async Task UpdateUserAsync(CreateOrUpdateUserInput input,
-             Action<IdentityUser> extraCallback = null)
+        public async Task UpdateUserAsync(CreateOrUpdateUserInput input, 
+             Action<IdentityUser> extraCallback = null,
+             bool isProfileChangeSilent = false,
+             bool isPasswordChangeSilent = false)
         {
 
             // Normalize values so that we can leverage the helper 
@@ -346,16 +355,21 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
 
             await CurrentUnitOfWork.SaveChangesAsync();
 
-            await LocalEventBus.PublishAsync(changedEvent);
+            if (!isProfileChangeSilent)
+            {
+                await LocalEventBus.PublishAsync(changedEvent);
+            }
 
             // Events 
-            if (passwordChangedEvent != null)
+            if (!isPasswordChangeSilent && passwordChangedEvent != null)
             {
                 await LocalEventBus.PublishAsync(passwordChangedEvent);
             }
         }
 
-        public async Task ResetUserPasswordAsync(Guid id, ResetUserPasswordDto input, bool runValidator)
+        public async Task ResetUserPasswordAsync(Guid id, ResetUserPasswordDto input, 
+            bool runValidator, 
+            bool isPasswordChangeSilent = false)
         {
             var user = await IdentityUserManager.GetByIdAsync(id);
 
@@ -386,15 +400,18 @@ namespace PolpAbp.ZeroAdaptors.Authorization.Users
                 await IdentityUserManager.UpdateAsync(user);
             }
 
-            var passwordChangedEvent = new PasswordChangedEvent()
+            if (!isPasswordChangeSilent)
             {
-                UserId = user.Id,
-                OperatorId = CurrentUser?.Id,
-                TenantId = CurrentUser.TenantId,
-                NewPassword = input.Password
-            };
+                var passwordChangedEvent = new PasswordChangedEvent()
+                {
+                    UserId = user.Id,
+                    OperatorId = CurrentUser?.Id,
+                    TenantId = CurrentUser.TenantId,
+                    NewPassword = input.Password
+                };
 
-            await LocalEventBus.PublishAsync(passwordChangedEvent);
+                await LocalEventBus.PublishAsync(passwordChangedEvent);
+            }
         }
 
         public async Task<GetUserPermissionsForEditOutput> GetUserPermissionsForEditAsync(Guid input)
