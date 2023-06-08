@@ -6,6 +6,7 @@ using Volo.Abp.BackgroundJobs;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Identity;
 using Volo.Abp.MultiTenancy;
+using Volo.Abp.Uow;
 
 namespace PolpAbp.ZeroAdaptors.BackgroundJobs
 {
@@ -24,6 +25,7 @@ namespace PolpAbp.ZeroAdaptors.BackgroundJobs
             _backgroundJobManager = backgroundJobManager;
         }
 
+        [UnitOfWork]
         public override async Task ExecuteAsync(ResetTenantUserPasswordsArgs args)
         {
             var iterator = new TenantMemberIterator(_currentTenant, _identityUserRepository);

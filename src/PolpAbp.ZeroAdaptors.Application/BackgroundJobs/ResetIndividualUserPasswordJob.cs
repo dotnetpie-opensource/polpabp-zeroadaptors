@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Volo.Abp.BackgroundJobs;
 using Volo.Abp.DependencyInjection;
+using Volo.Abp.Uow;
 
 namespace PolpAbp.ZeroAdaptors.BackgroundJobs
 {
@@ -15,6 +16,7 @@ namespace PolpAbp.ZeroAdaptors.BackgroundJobs
             _userHostAppService = userHostAppService;
         }
 
+        [UnitOfWork]
         public async override Task ExecuteAsync(ResetIndividualUserPasswordArgs args)
         {
             await _userHostAppService.ResetUserPasswordAsync(args.TenantId, args.UserId, args.Payload, args.OperatorId);
